@@ -30,6 +30,55 @@ export function generateCrewCandidates() {
   addLog("Novos candidatos aguardando na doca de recrutamento.");
 }
 
+export function rest() {
+  const crewStats = getCrewStats();
+
+  const dockingFee = 40;
+  const maintenanceFee = Math.round(gameState.credits * 0.04);
+  const salaryCost = crewStats.salaryPerDay;
+  const totalCost = dockingFee + maintenanceFee + salaryCost;
+
+  gameState.day += 1;
+  gameState.credits -= totalCost;
+
+  let hullRepaired = 0;
+  if (gameState.ship.hull < gameState.ship.maxHull) {
+    hullRepaired = Math.min(8, gameState.ship.maxHull - gameState.ship.hull);
+    gameState.ship.hull += hullRepaired;
+  }
+
+  let fuelRefilled = 0;
+  if (gameState.ship.fuel < gameState.ship.maxFuel) {
+    fuelRefilled = Math.min(12, gameState.ship.maxFuel - gameState.ship.fuel);
+    gameState.ship.fuel += fuelRefilled;
+  }
+
+  if (gameState.crew.length > 0) {
+    gameState.crew.forEach((member: any) => {
+      const recovered = randInt(12, 22);
+      member.fatigue = clamp(member.fatigue - recovered, 0, 100);
+      member.morale = clamp(member.morale + 3, 0, 100);
+    });
+  }
+
+  const costParts = [`docagem ${dockingFee} cr`, `manutenção ${maintenanceFee} cr`];
+  if (salaryCost > 0) costParts.push(`salários ${salaryCost} cr`);
+
+  const recoveryParts: string[] = [];
+  if (hullRepaired > 0) recoveryParts.push(`casco +${hullRepaired}`);
+  if (fuelRefilled > 0) recoveryParts.push(`combustível +${fuelRefilled}`);
+
+  const recoveryText = recoveryParts.length ? ` Recuperações: ${recoveryParts.join("; ")}.` : "";
+  const crewText = gameState.crew.length > 0 ? " Fadiga da tripulação reduzida." : " Sem tripulação a bordo.";
+
+  addLog(
+    `Você descansou na estação por 1 dia (${costParts.join(" + ")}, total ${totalCost} cr).${recoveryText}${crewText}`,
+    gameState.credits < 0 ? "warning" : "good"
+  );
+
+  checkMoraleEvents("rest");
+}
+
 export function hireCrew(id: string) {
   const candidate = gameState.crewCandidates.find((c: any) => c.id === id);
   if (!candidate) return;

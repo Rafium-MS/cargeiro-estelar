@@ -1,8 +1,8 @@
 // src/ui/render.ts
 import { gameState } from "../core/state";
 import { MAP_LOCATIONS, FACTIONS, repStatus } from "../core/data";
-import { getCrewStats, fireCrew, hireCrew } from "../systems/crew";
-import { acceptJob } from "../systems/jobs";
+import { getCrewStats, fireCrew, hireCrew, generateCrewCandidates, rest } from "../systems/crew";
+import { acceptJob, generateJobs } from "../systems/jobs";
 import { addLog } from "./log";
 
 export function renderState() {
@@ -302,4 +302,21 @@ export function renderAll() {
   renderCrew();
   renderCrewCandidates();
   renderJobs();
+}
+
+export function initUIBindings() {
+  document.getElementById("btn-new-jobs")?.addEventListener("click", () => {
+    generateJobs();
+    renderJobs();
+  });
+
+  document.getElementById("btn-new-candidates")?.addEventListener("click", () => {
+    generateCrewCandidates();
+    renderCrewCandidates();
+  });
+
+  document.getElementById("btn-rest")?.addEventListener("click", () => {
+    rest();
+    renderAll();
+  });
 }
