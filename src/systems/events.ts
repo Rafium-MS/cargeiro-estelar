@@ -31,6 +31,22 @@ export function applyTravelEvent(job: any) {
   const crewStats = getCrewStats();
   const rep = gameState.reputation;
 
+  const missionTitle = job.title ?? `${job.cargoType.name} → ${job.destination}`;
+  const baseMissionData = {
+    id: job.id,
+    title: missionTitle,
+    factionKey: job.clientFactionKey,
+    kind: "normal" as const,
+    day: gameState.day
+  };
+
+  const registerOutcome = (
+    reward: number,
+    status: "success" | "partial" | "failure" = "success"
+  ) => {
+    registerMissionCompletion({ ...baseMissionData, reward, status });
+  };
+
   let risk = job.riskBase;
   risk -= rep.authorities * 0.1;
   risk -= rep.syndicate * 0.05;
@@ -58,6 +74,7 @@ export function applyTravelEvent(job: any) {
       if (damage === 0) {
         addLog("Ataque de piratas, mas seu engenheiro e segurança contiveram o dano. Casco intacto!", "good");
         adjustCrewMoraleRange(+1, +3);
+        registerOutcome(0, "failure");
       } else {
         gameState.ship.hull = Math.max(0, gameState.ship.hull - damage);
         let extraNote = "";
@@ -68,6 +85,7 @@ export function applyTravelEvent(job: any) {
         addLog(`Ataque de piratas! O casco sofreu ${damage}% de dano.${extraNote}`, "danger");
         adjustCrewMoraleRange(-6, -3);
         adjustCrewFatigueAll(+4);
+        registerOutcome(0, "failure");
       }
       return;
     }
@@ -103,6 +121,7 @@ export function applyTravelEvent(job: any) {
           adjustCrewMoraleRange(-5, -3);
         }
 
+        registerOutcome(received, received > 0 ? "partial" : "failure");
         return;
       } else if (cargoKey === "fragile") {
         let lossPercent = randInt(15, 45);
@@ -110,7 +129,8 @@ export function applyTravelEvent(job: any) {
         if (lossPercent < 10) lossPercent = 10;
 
         const loss = Math.floor(job.pay * lossPercent / 100);
-        gameState.credits += (job.pay - loss);
+        const received = job.pay - loss;
+        gameState.credits += received;
         addLog(
           `Inspeção em ${job.destination} identificou danos na carga frágil. Você teve que reembolsar ${loss} créditos ao cliente.`,
           "warning"
@@ -118,6 +138,7 @@ export function applyTravelEvent(job: any) {
         adjustCrewMoraleRange(-3, -1);
         adjustCrewFatigueAll(+2);
         adjustReputation("corporations", -4);
+        registerOutcome(received, received > 0 ? "partial" : "failure");
         return;
       } else {
         let lossPercent = randInt(10, 40);
@@ -126,7 +147,8 @@ export function applyTravelEvent(job: any) {
         if (lossPercent < 5) lossPercent = 5;
 
         const loss = Math.floor(job.pay * lossPercent / 100);
-        gameState.credits += (job.pay - loss);
+        const received = job.pay - loss;
+        gameState.credits += received;
         addLog(
           `Fiscalização surpresa em ${job.destination}. Você teve que pagar ${loss} créditos em taxas e multas.`,
           "warning"
@@ -134,6 +156,7 @@ export function applyTravelEvent(job: any) {
         adjustCrewMoraleRange(-4, -1);
         adjustCrewFatigueAll(+2);
         adjustReputation("authorities", +2);
+        registerOutcome(received, received > 0 ? "partial" : "failure");
         return;
       }
     }
@@ -151,6 +174,7 @@ export function applyTravelEvent(job: any) {
       adjustCrewMoraleRange(-2, 0);
       adjustCrewFatigueAll(+2);
     }
+    registerOutcome(0, "failure");
     return;
   }
 
@@ -170,6 +194,7 @@ export function applyTravelEvent(job: any) {
       adjustCrewFatigueAll(+2);
       adjustReputation("syndicate", +10);
       adjustReputation("authorities", -5);
+      registerOutcome(job.pay + bonus);
       return;
     }
   }
@@ -186,6 +211,7 @@ export function applyTravelEvent(job: any) {
     adjustCrewMoraleRange(+5, +10);
     adjustCrewFatigueAll(+1);
     handleSuccessReputation(job);
+    registerOutcome(job.pay + bonus);
   } else {
     gameState.credits += job.pay;
     addLog(
@@ -195,6 +221,7 @@ export function applyTravelEvent(job: any) {
     adjustCrewMoraleRange(+1, +3);
     adjustCrewFatigueAll(+2);
     handleSuccessReputation(job);
+    registerOutcome(job.pay);
   }
 }
 
