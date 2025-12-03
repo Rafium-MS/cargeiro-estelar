@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Cargueiro Estelar: Rota Fronteira</title>
+  <style>
+    body {
+      background: #050815;
+      color: #e4f0ff;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+    }
+    .game {
+      max-width: 1100px;
+      width: 100%;
+      padding: 16px;
+    }
+    h1, h2, h3 {
+      margin: 0 0 8px;
+    }
+    .panel {
+      border: 1px solid #28334a;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 12px;
+      background: radial-gradient(circle at top, #131a33 0, #050815 60%);
+    }
+    .flex {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .flex > .panel {
+      flex: 1;
+      min-width: 260px;
+    }
+    .stat-label {
+      font-size: 0.85rem;
+      opacity: 0.8;
+    }
+    .stat-value {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    button {
+      background: #1e88e5;
+      border: none;
+      border-radius: 4px;
+      padding: 6px 10px;
+      color: white;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    button:hover {
+      filter: brightness(1.1);
+    }
+    button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    .jobs-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .job-card {
+      border: 1px solid #293856;
+      border-radius: 6px;
+      padding: 8px;
+      background: rgba(10, 18, 40, 0.8);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .job-main {
+      font-size: 0.9rem;
+    }
+    .job-meta {
+      font-size: 0.8rem;
+      opacity: 0.85;
+    }
+    .log {
+      font-size: 0.8rem;
+      max-height: 220px;
+      overflow-y: auto;
+      line-height: 1.4;
+      padding-right: 4px;
+    }
+    .log-entry {
+      margin-bottom: 4px;
+    }
+    .log-entry span.time {
+      opacity: 0.6;
+      font-size: 0.75rem;
+      margin-right: 4px;
+    }
+    .warning {
+      color: #ffb74d;
+    }
+    .danger {
+      color: #ef5350;
+    }
+    .good {
+      color: #81c784;
+    }
+    .small {
+      font-size: 0.8rem;
+      opacity: 0.8;
+    }
+    .crew-list, .crew-candidates {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 0.85rem;
+    }
+    .crew-member, .crew-candidate {
+      border: 1px solid #293856;
+      border-radius: 6px;
+      padding: 6px 8px;
+      background: rgba(8, 16, 32, 0.9);
+      display: flex;
+      justify-content: space-between;
+      gap: 6px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .crew-info-main {
+      font-weight: 500;
+    }
+    .crew-info-meta {
+      font-size: 0.8rem;
+      opacity: 0.9;
+    }
+    .tag {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.15);
+      font-size: 0.7rem;
+      margin-right: 4px;
+      opacity: 0.9;
+    }
+    .upgrade-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 0.85rem;
+      margin-top: 8px;
+    }
+    .upgrade-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: center;
+      border: 1px solid #293856;
+      border-radius: 6px;
+      padding: 6px 8px;
+      background: rgba(8, 16, 32, 0.9);
+      flex-wrap: wrap;
+    }
+    .upgrade-info-main {
+      font-weight: 500;
+    }
+    .upgrade-info-meta {
+      font-size: 0.8rem;
+      opacity: 0.9;
+    }
+    .map-list {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 0.8rem;
+      margin-top: 4px;
+    }
+    .map-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+      border-bottom: 1px dashed rgba(255,255,255,0.08);
+      padding-bottom: 2px;
+    }
+  </style>
+</head>
+<body>
+  <div class="game">
+    <h1>Cargueiro Estelar: Rota Fronteira <span class="small">(Mapa, Reputação & Missões Especiais)</span></h1>
+
+    <div class="flex">
+      <div class="panel">
+        <h2>Nave / Capitão</h2>
+        <div class="stat-label">Nave</div>
+        <div class="stat-value" id="ship-name"></div>
+
+        <div class="stat-label">Dia</div>
+        <div class="stat-value" id="day"></div>
+
+        <div class="stat-label">Créditos</div>
+        <div class="stat-value" id="credits"></div>
+
+        <div class="stat-label">Casco</div>
+        <div class="stat-value" id="hull"></div>
+
+        <div class="stat-label">Combustível</div>
+        <div class="stat-value" id="fuel"></div>
+
+        <div class="stat-label">Capacidade de Carga</div>
+        <div class="stat-value" id="cargo"></div>
+
+        <div class="stat-label">Localização Atual</div>
+        <div class="stat-value" id="location"></div>
+      </div>
+
+      <div class="panel">
+        <h2>Trabalhos Disponíveis</h2>
+        <div class="jobs-list" id="jobs-list"></div>
+        <button id="btn-new-jobs">Atualizar trabalhos</button>
+        <button id="btn-rest" style="margin-left:4px;">Descansar na estação (1 dia)</button>
+        <div class="small">
+          Trabalhos normais e <strong>Missões Especiais</strong> aparecem aqui.
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>Tripulação</h2>
+        <div class="stat-label">Capacidade</div>
+        <div class="stat-value" id="crew-capacity"></div>
+
+        <div class="stat-label">Custo diário em salários</div>
+        <div class="stat-value" id="crew-salary"></div>
+
+        <div class="stat-label">Moral média / Fadiga média</div>
+        <div class="stat-value" id="crew-mood"></div>
+
+        <div class="stat-label">Bônus de tripulação</div>
+        <div class="stat-value" id="crew-bonus"></div>
+
+        <h3 style="margin-top:8px;">Membros atuais</h3>
+        <div class="crew-list" id="crew-list"></div>
+
+        <h3 style="margin-top:8px;">Contratação</h3>
+        <button id="btn-new-candidates">Gerar candidatos</button>
+        <div class="small">
+          Tripulantes ajudam nos eventos, mas cobram salário, cansam,
+          podem pedir aumento… ou se revoltar.
+        </div>
+        <div class="crew-candidates" id="crew-candidates"></div>
+      </div>
+    </div>
+
+    <div class="flex">
+      <div class="panel">
+        <h2>Hangar / Upgrades da Nave</h2>
+        <div class="small">
+          Melhore casco, carga, combustível e alojamentos. Custos sobem a cada nível.
+        </div>
+        <div id="upgrades-list" class="upgrade-list"></div>
+      </div>
+
+      <div class="panel">
+        <h2>Mapa de Rotas / Setor</h2>
+        <div class="small">
+          Zonas de <strong>Fiscalização</strong> têm mais inspeções; zonas de <strong>Piratas</strong> têm mais ataques.
+        </div>
+        <div id="map-list" class="map-list"></div>
+      </div>
+
+      <div class="panel">
+        <h2>Facções & Reputação</h2>
+        <div class="small">
+          Reputação alta com uma facção pode destravar <strong>missões de história</strong> exclusivas.
+        </div>
+        <div id="rep-list" class="map-list"></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Registro de Eventos</h2>
+      <div class="log" id="log"></div>
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>
