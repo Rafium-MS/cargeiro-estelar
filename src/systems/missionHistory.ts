@@ -8,8 +8,12 @@ export function registerMissionCompletion(payload: {
   kind: "normal" | "especial";
   reward: number;
   day: number;
+  status?: "success" | "partial" | "failure";
 }) {
-  gameState.missionHistory.push(payload);
+  gameState.missionHistory.push({
+    ...payload,
+    status: payload.status ?? "success"
+  });
 }
 
 export function getMissionHistory() {

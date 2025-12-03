@@ -327,13 +327,20 @@ export function renderHistory() {
         ? `<span class="tag">Missão Especial</span>`
         : `<span class="tag">Normal</span>`;
 
+    const status =
+      m.status === "failure"
+        ? `<span class="tag danger">Falha</span>`
+        : m.status === "partial"
+          ? `<span class="tag warning">Parcial</span>`
+          : `<span class="tag">Concluída</span>`;
+
     row.innerHTML = `
       <span>
         <strong>${m.title}</strong><br>
         Dia ${m.day} · ${factionLabel}
       </span>
       <span>
-        ${tipo}<br>
+        ${tipo} ${status}<br>
         Recompensa: ${m.reward} cr
       </span>
     `;
