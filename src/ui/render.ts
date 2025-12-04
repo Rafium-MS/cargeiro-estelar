@@ -5,17 +5,26 @@ import { getCrewStats, fireCrew, hireCrew, getCrewEffectLabels } from "../system
 import { acceptJob } from "../systems/jobs";
 import { addLog } from "./log";
 import { calculateRefuelCost, fuelMissing } from "../systems/fuel";
+import { getShipyardCatalog, switchShip, getShipTraitSummary } from "../systems/shipyard";
 
 export function renderState() {
   (document.getElementById("ship-name") as HTMLElement).textContent = gameState.ship.name;
   (document.getElementById("day") as HTMLElement).textContent = String(gameState.day);
   (document.getElementById("credits") as HTMLElement).textContent = `${gameState.credits} cr`;
+  const shipTier = document.getElementById("ship-tier");
+  if (shipTier) shipTier.textContent = `Tier ${gameState.ship.tier}`;
+  const shipDesc = document.getElementById("ship-desc");
+  if (shipDesc) shipDesc.textContent = gameState.ship.description;
+  const shipTraits = document.getElementById("ship-traits");
+  if (shipTraits) shipTraits.textContent = gameState.ship.traits.join(" · ");
+  const cargoLabel = gameState.ship.smugglerHold
+    ? `${gameState.ship.cargoCapacity} unidades + ${gameState.ship.smugglerHold} ocultas`
+    : `${gameState.ship.cargoCapacity} unidades máx.`;
   (document.getElementById("hull") as HTMLElement).textContent =
     `${gameState.ship.hull}% / ${gameState.ship.maxHull}%`;
   (document.getElementById("fuel") as HTMLElement).textContent =
     `${gameState.ship.fuel} / ${gameState.ship.maxFuel}`;
-  (document.getElementById("cargo") as HTMLElement).textContent =
-    `${gameState.ship.cargoCapacity} unidades máx.`;
+  (document.getElementById("cargo") as HTMLElement).textContent = cargoLabel;
   (document.getElementById("location") as HTMLElement).textContent = gameState.location;
 
   const sidebarDay = document.getElementById("sidebar-day");
@@ -301,6 +310,69 @@ export function renderUpgrades() {
   });
 }
 
+export function renderShipyard() {
+  const container = document.getElementById("shipyard-list");
+  if (!container) return;
+
+  container.innerHTML = "";
+  const catalog = getShipyardCatalog();
+
+  catalog.forEach(ship => {
+    const card = document.createElement("div");
+    card.className = "ship-card";
+
+    const header = document.createElement("div");
+    header.className = "ship-card-header";
+    header.innerHTML = `
+      <div>
+        <div class="ship-name">${ship.name}</div>
+        <div class="small">Tier ${ship.tier}</div>
+      </div>
+      <div class="tag">${ship.price} cr</div>
+    `;
+
+    const desc = document.createElement("div");
+    desc.className = "ship-card-desc";
+    desc.textContent = ship.description;
+
+    const stats = document.createElement("div");
+    stats.className = "ship-card-stats";
+    const cargoText = ship.smugglerHold
+      ? `${ship.cargo}u (+${ship.smugglerHold}u ocultas)`
+      : `${ship.cargo}u`;
+    stats.textContent = `Carga ${cargoText} · Casco ${ship.hull} · Combustível ${ship.fuel} · Tripulação ${ship.crew}`;
+
+    const traits = document.createElement("div");
+    traits.className = "ship-card-traits";
+    traits.textContent = getShipTraitSummary(ship);
+    if (ship.unlockHint) {
+      const hint = document.createElement("div");
+      hint.className = "ship-card-hint";
+      hint.textContent = ship.unlockHint;
+      traits.appendChild(hint);
+    }
+
+    const actions = document.createElement("div");
+    actions.className = "ship-card-actions";
+    const btn = document.createElement("button");
+    const isCurrent = ship.key === gameState.ship.key;
+    btn.textContent = isCurrent ? "Em operação" : `Adquirir (${ship.price} cr)`;
+    btn.disabled = isCurrent || gameState.credits < ship.price;
+    btn.onclick = () => {
+      switchShip(ship.key);
+      renderAll();
+    };
+    actions.appendChild(btn);
+
+    card.appendChild(header);
+    card.appendChild(desc);
+    card.appendChild(stats);
+    card.appendChild(traits);
+    card.appendChild(actions);
+    container.appendChild(card);
+  });
+}
+
 export function renderMap() {
   const container = document.getElementById("map-list")!;
   container.innerHTML = "";
@@ -386,5 +458,6 @@ export function renderAll() {
   renderCrew();
   renderCrewCandidates();
   renderJobs();
+  renderShipyard();
   renderHistory();
 }

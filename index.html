@@ -203,6 +203,29 @@
       gap: 8px;
       flex-wrap: wrap;
     }
+
+    .shipyard-list { display: flex; flex-direction: column; gap: 8px; }
+    .ship-card {
+      border: 1px solid #28334a;
+      border-radius: 10px;
+      background: var(--panel-strong);
+      padding: 10px;
+      display: grid;
+      gap: 6px;
+    }
+
+    .ship-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .ship-name { font-weight: 700; }
+    .ship-card-desc { color: var(--muted); }
+    .ship-card-stats { font-size: 0.9rem; }
+    .ship-card-traits { font-size: 0.9rem; color: var(--muted); }
+    .ship-card-hint { font-size: 0.8rem; color: var(--warning); }
+    .ship-card-actions { display: flex; justify-content: flex-end; }
     .job-main { font-size: 0.9rem; }
     .job-meta { font-size: 0.8rem; color: var(--muted); }
 
@@ -342,6 +365,15 @@
             <div class="stat-label">Nave</div>
             <div class="stat-value" id="ship-name"></div>
 
+            <div class="stat-label">Tier / Perfil</div>
+            <div class="stat-value" id="ship-tier"></div>
+
+            <div class="stat-label">Descrição</div>
+            <div class="stat-value" id="ship-desc"></div>
+
+            <div class="stat-label">Traços especiais</div>
+            <div class="stat-value" id="ship-traits"></div>
+
             <div class="stat-label">Dia</div>
             <div class="stat-value" id="day"></div>
 
@@ -416,10 +448,17 @@
       </section>
 
       <section class="view" id="view-hangar">
-        <div class="panel">
-          <h2>Hangar / Upgrades da Nave</h2>
-          <div class="small">Melhore casco, carga, combustível e alojamentos. Custos sobem a cada nível.</div>
-          <div id="upgrades-list" class="upgrade-list"></div>
+        <div class="panel-grid">
+          <div class="panel">
+            <h2>Hangar / Upgrades da Nave</h2>
+            <div class="small">Melhore casco, carga, combustível e alojamentos. Custos sobem a cada nível.</div>
+            <div id="upgrades-list" class="upgrade-list"></div>
+          </div>
+          <div class="panel">
+            <h2>Docas / Troca de Cargueiro</h2>
+            <div class="small">Escolha um novo casco quando tiver créditos suficientes. Upgrades já instalados são aplicados ao novo navio.</div>
+            <div id="shipyard-list" class="shipyard-list"></div>
+          </div>
         </div>
       </section>
 

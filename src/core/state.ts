@@ -1,23 +1,32 @@
 // src/core/state.ts
 import { MAP_LOCATIONS } from "./data";
+import { getShipDefinition } from "./ships";
+
+const startingShip = getShipDefinition("lv-01")!;
 
 export const gameState = {
   day: 1,
   credits: 1000,
   ship: {
-    name: "Cargueiro LV-01",
-    hull: 100,
-    maxHull: 100,
-    fuel: 100,
-    maxFuel: 100,
-    cargoCapacity: 20,
+    key: startingShip.key,
+    name: startingShip.name,
+    tier: startingShip.tier,
+    description: startingShip.description,
+    traits: startingShip.traits,
+    smugglerHold: startingShip.smugglerHold ?? 0,
+    price: startingShip.price,
+    hull: startingShip.hull,
+    maxHull: startingShip.hull,
+    fuel: startingShip.fuel,
+    maxFuel: startingShip.fuel,
+    cargoCapacity: startingShip.cargo,
     cargoUsed: 0
   },
   location: "Estação Alfa-3",
   jobs: [] as any[],
   log: [] as any[],
   crew: [] as any[],
-  crewCapacity: 3,
+  crewCapacity: startingShip.crew,
   crewCandidates: [] as any[],
   upgrades: {
     hull: 0,
