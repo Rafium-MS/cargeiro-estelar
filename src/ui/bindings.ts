@@ -17,6 +17,18 @@ export function renderState() {
     `${gameState.ship.cargoCapacity} unidades máx.`;
   (document.getElementById("location") as HTMLElement).textContent = gameState.location;
 
+  const sidebarDay = document.getElementById("sidebar-day");
+  if (sidebarDay) sidebarDay.textContent = `Dia ${gameState.day}`;
+
+  const sidebarCredits = document.getElementById("sidebar-credits");
+  if (sidebarCredits) sidebarCredits.textContent = `${gameState.credits} cr`;
+
+  const sidebarFuel = document.getElementById("sidebar-fuel");
+  if (sidebarFuel) sidebarFuel.textContent = `${gameState.ship.fuel}/${gameState.ship.maxFuel}`;
+
+  const sidebarLocation = document.getElementById("sidebar-location");
+  if (sidebarLocation) sidebarLocation.textContent = gameState.location;
+
   const crewStats = getCrewStats();
   (document.getElementById("crew-capacity") as HTMLElement).textContent =
     `${gameState.crew.length} / ${gameState.crewCapacity} membros`;
@@ -304,7 +316,35 @@ export function renderAll() {
   renderJobs();
 }
 
+function activateView(targetId: string) {
+  const views = Array.from(document.querySelectorAll<HTMLElement>(".view"));
+  const navButtons = Array.from(document.querySelectorAll<HTMLElement>(".nav-item"));
+
+  views.forEach(view => view.classList.toggle("active", view.id === targetId));
+  navButtons.forEach(btn => btn.classList.toggle("active", btn.dataset.target === targetId));
+}
+
+function initNavigation() {
+  const navButtons = Array.from(document.querySelectorAll<HTMLElement>(".nav-item"));
+  const firstTarget = navButtons[0]?.dataset.target;
+
+  navButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const target = btn.dataset.target;
+      if (target) {
+        activateView(target);
+      }
+    });
+  });
+
+  if (firstTarget) {
+    activateView(firstTarget);
+  }
+}
+
 export function initUIBindings() {
+  initNavigation();
+
   document.getElementById("btn-new-jobs")?.addEventListener("click", () => {
     generateJobs();
     renderJobs();

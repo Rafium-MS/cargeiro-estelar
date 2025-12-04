@@ -17,6 +17,18 @@ export function renderState() {
     `${gameState.ship.cargoCapacity} unidades máx.`;
   (document.getElementById("location") as HTMLElement).textContent = gameState.location;
 
+  const sidebarDay = document.getElementById("sidebar-day");
+  if (sidebarDay) sidebarDay.textContent = `Dia ${gameState.day}`;
+
+  const sidebarCredits = document.getElementById("sidebar-credits");
+  if (sidebarCredits) sidebarCredits.textContent = `${gameState.credits} cr`;
+
+  const sidebarFuel = document.getElementById("sidebar-fuel");
+  if (sidebarFuel) sidebarFuel.textContent = `${gameState.ship.fuel}/${gameState.ship.maxFuel}`;
+
+  const sidebarLocation = document.getElementById("sidebar-location");
+  if (sidebarLocation) sidebarLocation.textContent = gameState.location;
+
   const crewStats = getCrewStats();
   (document.getElementById("crew-capacity") as HTMLElement).textContent =
     `${gameState.crew.length} / ${gameState.crewCapacity} membros`;
