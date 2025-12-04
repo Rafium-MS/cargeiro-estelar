@@ -32,8 +32,17 @@ export const gameState = {
   },
   storyFlags: {
     authMission1: false,
+    authMission1Complete: false,
+    authMission2: false,
+    authMission2Complete: false,
     corpMission1: false,
-    syndMission1: false
+    corpMission1Complete: false,
+    corpMission2: false,
+    corpMission2Complete: false,
+    syndMission1: false,
+    syndMission1Complete: false,
+    syndMission2: false,
+    syndMission2Complete: false
   },
   missionHistory: [] as any[]
 };
