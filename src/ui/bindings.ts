@@ -4,6 +4,7 @@ import { MAP_LOCATIONS, FACTIONS, repStatus } from "../core/data";
 import { getCrewStats, fireCrew, hireCrew, generateCrewCandidates, rest } from "../systems/crew";
 import { acceptJob, generateJobs } from "../systems/jobs";
 import { addLog } from "./log";
+import { calculateRefuelCost, fuelMissing, refuelShip } from "../systems/fuel";
 
 export function renderState() {
   (document.getElementById("ship-name") as HTMLElement).textContent = gameState.ship.name;
@@ -28,6 +29,16 @@ export function renderState() {
 
   const sidebarLocation = document.getElementById("sidebar-location");
   if (sidebarLocation) sidebarLocation.textContent = gameState.location;
+
+  const refuelBtn = document.getElementById("btn-refuel") as HTMLButtonElement | null;
+  if (refuelBtn) {
+    const missingFuel = fuelMissing();
+    const refuelCost = calculateRefuelCost();
+    refuelBtn.textContent = missingFuel === 0
+      ? "Combustível cheio"
+      : `Abastecer (${missingFuel} por ${refuelCost} cr)`;
+    refuelBtn.disabled = missingFuel === 0;
+  }
 
   const crewStats = getCrewStats();
   (document.getElementById("crew-capacity") as HTMLElement).textContent =
@@ -357,6 +368,11 @@ export function initUIBindings() {
 
   document.getElementById("btn-rest")?.addEventListener("click", () => {
     rest();
+    renderAll();
+  });
+
+  document.getElementById("btn-refuel")?.addEventListener("click", () => {
+    refuelShip();
     renderAll();
   });
 }
