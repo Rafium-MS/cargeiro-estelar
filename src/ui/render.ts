@@ -1,7 +1,7 @@
 // src/ui/render.ts
 import { gameState } from "../core/state";
 import { MAP_LOCATIONS, FACTIONS, repStatus } from "../core/data";
-import { getCrewStats, fireCrew, hireCrew } from "../systems/crew";
+import { getCrewStats, fireCrew, hireCrew, getCrewEffectLabels } from "../systems/crew";
 import { acceptJob } from "../systems/jobs";
 import { addLog } from "./log";
 import { calculateRefuelCost, fuelMissing } from "../systems/fuel";
@@ -62,6 +62,14 @@ export function renderState() {
 
   (document.getElementById("crew-bonus") as HTMLElement).textContent =
     bonusDesc.length ? bonusDesc.join(" · ") : "Nenhum bônus ativo. Contrate alguém!";
+
+  const crewEffects = getCrewEffectLabels();
+  const effectsTarget = document.getElementById("crew-effects") as HTMLElement | null;
+  if (effectsTarget) {
+    effectsTarget.textContent = crewEffects.length
+      ? crewEffects.join(" · ")
+      : "Nenhuma condição especial ativa.";
+  }
 
   renderUpgrades();
   renderMap();
@@ -142,7 +150,8 @@ export function renderCrew() {
       <div class="crew-info-meta">
         <span class="tag">${member.role}</span>
         Nível base ${member.skill} · Moral ${member.morale} · Fadiga ${member.fatigue}<br>
-        ${member.salaryPerDay} cr/dia
+        ${member.salaryPerDay} cr/dia<br>
+        ${(member.effects || []).map((e: any) => `${e.name} – ${e.description}`).join(" · ") || "Sem efeitos"}
       </div>
     `;
 
@@ -183,7 +192,8 @@ export function renderCrewCandidates() {
       <div class="crew-info-main">${c.name}</div>
       <div class="crew-info-meta">
         <span class="tag">${c.role}</span>
-        Nível ${c.skill} · Moral ${c.morale} · Fadiga ${c.fatigue} · ${c.salaryPerDay} cr/dia
+        Nível ${c.skill} · Moral ${c.morale} · Fadiga ${c.fatigue} · ${c.salaryPerDay} cr/dia<br>
+        ${(c.effects || []).map((e: any) => `${e.name} – ${e.description}`).join(" · ") || "Sem efeitos"}
       </div>
     `;
 

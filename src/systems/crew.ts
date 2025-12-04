@@ -3,11 +3,116 @@ import { gameState } from "../core/state";
 import { ROLES, NAME_POOL, randInt, chooseRandom, clamp } from "../core/data";
 import { addLog } from "../ui/log";
 
+type CrewEffect = {
+  key: string;
+  name: string;
+  type: "buff" | "debuff";
+  description: string;
+  riskMod?: number; // altera chance de evento ruim
+  fuelPercent?: number; // modifica custo de combustível
+  hullDamagePercent?: number; // modifica dano ao casco
+  fatigueFlat?: number; // modifica fadiga recebida em viagens
+  bonusRoll?: number; // aumenta chance de bônus ao entregar
+  skillBonus?: Partial<Record<"pilot" | "engineer" | "security" | "logistics", number>>;
+};
+
+const CREW_EFFECT_POOL: CrewEffect[] = [
+  {
+    key: "lucky_nav",
+    name: "Navegador Pé-Quente",
+    type: "buff",
+    description: "-8 de risco em viagens e pequenas dicas de rotas seguras.",
+    riskMod: -8,
+    bonusRoll: 5
+  },
+  {
+    key: "fuel_saver",
+    name: "Economia de Combustível",
+    type: "buff",
+    description: "-15% de combustível gasto e mais fôlego para a tripulação.",
+    fuelPercent: -15,
+    fatigueFlat: -2
+  },
+  {
+    key: "hull_veteran",
+    name: "Veterano de Casco",
+    type: "buff",
+    description: "-20% de dano recebido no casco e +1 em Engenharia efetiva.",
+    hullDamagePercent: -20,
+    skillBonus: { engineer: 1 }
+  },
+  {
+    key: "logistics_pro",
+    name: "Olho para Gorjetas",
+    type: "buff",
+    description: "+8 no rolagem de bônus de entrega e +1 em Logística.",
+    bonusRoll: 8,
+    skillBonus: { logistics: 1 }
+  },
+  {
+    key: "reckless",
+    name: "Piloto Imprudente",
+    type: "debuff",
+    description: "+12% de combustível gasto e +5 de risco em viagens.",
+    fuelPercent: 12,
+    riskMod: 5
+  },
+  {
+    key: "tired",
+    name: "Sono Irregular",
+    type: "debuff",
+    description: "+4 de fadiga ao viajar; tem dificuldade para longos saltos.",
+    fatigueFlat: 4
+  },
+  {
+    key: "hull_curse",
+    name: "Azar com Casco",
+    type: "debuff",
+    description: "+15% de dano tomado em ataques ou eventos.",
+    hullDamagePercent: 15
+  },
+  {
+    key: "greenhorn",
+    name: "Inexperiente",
+    type: "debuff",
+    description: "-1 no atributo principal e +2 de risco em viagens.",
+    riskMod: 2,
+    skillBonus: { pilot: -1, engineer: -1, security: -1, logistics: -1 }
+  }
+];
+
+export function getCrewEffectModifiers() {
+  return gameState.crew.reduce(
+    (acc: any, member: any) => {
+      (member.effects || []).forEach((effect: CrewEffect) => {
+        acc.riskMod += effect.riskMod ?? 0;
+        acc.fuelPercent += effect.fuelPercent ?? 0;
+        acc.hullDamagePercent += effect.hullDamagePercent ?? 0;
+        acc.fatigueFlat += effect.fatigueFlat ?? 0;
+        acc.bonusRoll += effect.bonusRoll ?? 0;
+      });
+      return acc;
+    },
+    { riskMod: 0, fuelPercent: 0, hullDamagePercent: 0, fatigueFlat: 0, bonusRoll: 0 }
+  );
+}
+
+export function getCrewEffectLabels() {
+  const labels: string[] = [];
+  gameState.crew.forEach((member: any) => {
+    (member.effects || []).forEach((effect: CrewEffect) => {
+      labels.push(`${effect.name} (${effect.type === "buff" ? "bônus" : "penalidade"})`);
+    });
+  });
+  return labels;
+}
+
 export function generateCrewCandidate() {
   const name = chooseRandom(NAME_POOL);
   const roleInfo = chooseRandom(ROLES);
   const skill = randInt(1, 5);
   const baseSalary = 80 + skill * randInt(20, 45);
+  const effect = chooseRandom(CREW_EFFECT_POOL);
 
   return {
     id: "crew_" + Date.now() + "_" + Math.random().toString(16).slice(2),
@@ -17,7 +122,8 @@ export function generateCrewCandidate() {
     skill,
     salaryPerDay: baseSalary,
     morale: randInt(60, 90),
-    fatigue: randInt(0, 20)
+    fatigue: randInt(0, 20),
+    effects: [effect]
   };
 }
 
@@ -161,6 +267,13 @@ export function getCrewStats() {
     if (member.morale < 20) effectiveSkill -= 1;
     if (member.fatigue > 60) effectiveSkill -= 1;
     if (member.fatigue > 80) effectiveSkill -= 1;
+
+    (member.effects || []).forEach((effect: CrewEffect) => {
+      const bonus = effect.skillBonus?.[member.key];
+      if (typeof bonus === "number") {
+        effectiveSkill += bonus;
+      }
+    });
 
     if (effectiveSkill < 0) effectiveSkill = 0;
 

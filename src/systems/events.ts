@@ -5,7 +5,8 @@ import { addLog } from "../ui/log";
 import {
   getCrewStats,
   adjustCrewMoraleRange,
-  adjustCrewFatigueAll
+  adjustCrewFatigueAll,
+  getCrewEffectModifiers
 } from "./crew";
 import { adjustReputation, checkStoryMissionTriggers } from "./story";
 import { registerMissionCompletion } from "./missionHistory";
@@ -29,6 +30,7 @@ export function handleSuccessReputation(job: any) {
 
 export function applyTravelEvent(job: any) {
   const crewStats = getCrewStats();
+  const effects = getCrewEffectModifiers();
   const rep = gameState.reputation;
 
   const missionTitle = job.title ?? `${job.cargoType.name} → ${job.destination}`;
@@ -69,6 +71,7 @@ export function applyTravelEvent(job: any) {
     if (eventType === 1) {
       let damage = randInt(5, 20);
       damage -= crewStats.engineer * 2;
+      damage = Math.round(damage * (1 + (effects.hullDamagePercent ?? 0) / 100));
       if (damage < 0) damage = 0;
 
       if (damage === 0) {
@@ -162,9 +165,10 @@ export function applyTravelEvent(job: any) {
     }
 
     // rota/clima
-    let fuelLoss = randInt(5, 18);
-    fuelLoss -= crewStats.pilot * 2;
-    if (fuelLoss < 0) fuelLoss = 0;
+        let fuelLoss = randInt(5, 18);
+        fuelLoss -= crewStats.pilot * 2;
+        fuelLoss = Math.round(fuelLoss * (1 + (effects.fuelPercent ?? 0) / 100));
+        if (fuelLoss < 0) fuelLoss = 0;
     if (fuelLoss === 0) {
       addLog("Desvio de rota necessário, mas seu piloto encontrou a rota mais eficiente. Sem perda extra de combustível.", "good");
       adjustCrewMoraleRange(+1, +3);
@@ -179,7 +183,7 @@ export function applyTravelEvent(job: any) {
   }
 
   // Sem evento negativo, talvez bônus
-  let bonusRoll = randInt(1, 100) + getCrewStats().logistics * 2;
+  let bonusRoll = randInt(1, 100) + getCrewStats().logistics * 2 + (effects.bonusRoll ?? 0);
 
   if (cargoKey === "smuggle") {
     const bonusChance = bonusRoll + 10;
