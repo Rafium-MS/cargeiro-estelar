@@ -6,7 +6,8 @@ import {
   getCrewStats,
   adjustCrewMoraleRange,
   adjustCrewFatigueAll,
-  checkMoraleEvents
+  checkMoraleEvents,
+  getCrewEffectModifiers
 } from "./crew";
 import { applyTravelEvent } from "./events";
 import { factionPayMultiplier } from "./story";
@@ -113,7 +114,10 @@ export function acceptJob(jobId: string) {
   const job = gameState.jobs.find((j: any) => j.id === jobId);
   if (!job) return;
 
-  if (gameState.ship.fuel < job.fuelCost) {
+  const effectMods = getCrewEffectModifiers();
+  const effectiveFuelCost = Math.max(1, Math.round(job.fuelCost * (1 + (effectMods.fuelPercent ?? 0) / 100)));
+
+  if (gameState.ship.fuel < effectiveFuelCost) {
     addLog("Combustível insuficiente para essa rota. Abasteça ou escolha um trabalho mais perto.", "warning");
     return;
   }
@@ -138,16 +142,21 @@ export function acceptJob(jobId: string) {
     }
   }
 
-  gameState.ship.fuel -= job.fuelCost;
-  gameState.location = job.destination;
+  const adjustedRiskBase = Math.max(1, Math.min(100, Math.round(job.riskBase + (effectMods.riskMod ?? 0))));
+
+  const travelingJob = { ...job, fuelCost: effectiveFuelCost, riskBase: adjustedRiskBase };
+
+  gameState.ship.fuel -= effectiveFuelCost;
+  gameState.location = travelingJob.destination;
   gameState.day += 1;
 
   if (gameState.crew.length > 0) {
     gameState.crew.forEach((member: any) => {
       const baseFatigue = 6;
       const distanceFactor = Math.floor(job.distance);
-      const riskFactor = Math.floor(job.riskBase / 40);
-      member.fatigue = Math.min(100, member.fatigue + baseFatigue + distanceFactor + riskFactor);
+      const riskFactor = Math.floor(adjustedRiskBase / 40);
+      const fatigueFromEffects = effectMods.fatigueFlat ?? 0;
+      member.fatigue = Math.min(100, member.fatigue + baseFatigue + distanceFactor + riskFactor + fatigueFromEffects);
     });
   }
 
@@ -158,14 +167,14 @@ export function acceptJob(jobId: string) {
     );
   } else {
     addLog(
-      `Você partiu de ${job.origin} levando ${job.cargoAmount} unidades de ${job.cargoType.name} para ${job.destination}. (Distância: ${job.distance} UA, Risco base: ${job.riskBase}%, Cliente: ${job.clientFactionShort})`
+      `Você partiu de ${job.origin} levando ${job.cargoAmount} unidades de ${job.cargoType.name} para ${job.destination}. (Distância: ${job.distance} UA, Risco base: ${adjustedRiskBase}%, Cliente: ${job.clientFactionShort}, Combustível: ${effectiveFuelCost})`
     );
   }
 
   if (job.isStory) {
     runStoryMissionOutcome(job);
   } else {
-    applyTravelEvent(job);
+    applyTravelEvent(travelingJob);
   }
 
   generateJobs();
