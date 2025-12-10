@@ -6,7 +6,12 @@ export const MAP_LOCATIONS = [
   { name: "Porto Espacial Orion Prime", x: -3, y: 2, zone: "Núcleo" },
   { name: "Colônia Fronteira Kaelum", x: 7,  y: -2, zone: "Fronteira" },
   { name: "Entreposto Asteroidal 7-G", x: 10, y: -4, zone: "Zona de Piratas" },
-  { name: "Terminal Mercante Draconis", x: 2,  y: -6, zone: "Zona de Fiscalização" }
+  { name: "Terminal Mercante Draconis", x: 2,  y: -6, zone: "Zona de Fiscalização" },
+  { name: "Plataforma Helix-9", x: -5, y: -1, zone: "Núcleo" },
+  { name: "Observatório Aurora", x: -1, y: 6,  zone: "Zona de Fiscalização" },
+  { name: "Ponto de Reabastecimento Kuiper", x: 9,  y: 3,  zone: "Fronteira" },
+  { name: "Enclave Livre Altair", x: 5,  y: 5,  zone: "Fronteira" },
+  { name: "Mina Profunda Kor-21", x: 12, y: -7, zone: "Zona de Piratas" }
 ];
 
 export const FACTIONS = [
