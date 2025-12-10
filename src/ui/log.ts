@@ -1,14 +1,10 @@
 // src/ui/log.ts
 import { LogEntry } from "../core/models";
+import { addLog as recordLog } from "../core/services/log";
 import { gameState } from "../core/state";
 
 export function addLog(message: string, type: "" | "danger" | "warning" | "good" = "") {
-  const entry: LogEntry = {
-    day: gameState.day,
-    message,
-    type
-  };
-  gameState.log.unshift(entry);
+  recordLog(message, type);
   renderLog();
 }
 

@@ -1,8 +1,9 @@
 // src/systems/crew.ts
 import { ROLES, NAME_POOL, randInt, chooseRandom, clamp } from "../core/data";
 import { CrewEffect, CrewMember } from "../core/models";
+import { addLog } from "../core/services/log";
+import { ActionResult } from "../core/services/types";
 import { gameState } from "../core/state";
-import { addLog } from "../ui/log";
 
 const CREW_EFFECT_POOL: CrewEffect[] = [
   {
@@ -115,16 +116,17 @@ export function generateCrewCandidate() {
   };
 }
 
-export function generateCrewCandidates() {
+export function generateCrewCandidates(): ActionResult {
   const candidates: CrewMember[] = [];
   for (let i = 0; i < 3; i++) {
     candidates.push(generateCrewCandidate());
   }
   gameState.crewCandidates = candidates;
   addLog("Novos candidatos aguardando na doca de recrutamento.");
+  return { success: true };
 }
 
-export function rest() {
+export function rest(): ActionResult {
   const crewStats = getCrewStats();
 
   const dockingFee = 40;
@@ -171,30 +173,35 @@ export function rest() {
   );
 
   checkMoraleEvents("rest");
+  return { success: true };
 }
 
-export function hireCrew(id: string) {
+export function hireCrew(id: string): ActionResult {
   const candidate = gameState.crewCandidates.find(c => c.id === id);
-  if (!candidate) return;
+  if (!candidate) return { success: false, error: "Candidato não encontrado" };
 
   if (gameState.crew.length >= gameState.crewCapacity) {
     addLog("Você não tem alojamentos suficientes para mais tripulantes. Expanda a nave no hangar.", "warning");
-    return;
+    return { success: false, error: "Capacidade insuficiente" };
   }
 
   if (gameState.credits < candidate.salaryPerDay * 2) {
-    addLog("Créditos insuficientes para contratar esse tripulante com segurança (recomendado ter ao menos 2 dias de salário).", "warning");
-    return;
+    addLog(
+      "Créditos insuficientes para contratar esse tripulante com segurança (recomendado ter ao menos 2 dias de salário).",
+      "warning"
+    );
+    return { success: false, error: "Créditos insuficientes" };
   }
 
   gameState.crew.push(candidate);
   gameState.crewCandidates = gameState.crewCandidates.filter(c => c.id !== id);
   addLog(`Você contratou ${candidate.name} como ${candidate.role}.`, "good");
+  return { success: true };
 }
 
-export function fireCrew(id: string) {
+export function fireCrew(id: string): ActionResult {
   const member = gameState.crew.find(m => m.id === id);
-  if (!member) return;
+  if (!member) return { success: false, error: "Tripulante não encontrado" };
 
   gameState.crew = gameState.crew.filter(m => m.id !== id);
   addLog(`Você demitiu ${member.name} (${member.role}). O clima a bordo mudou.`, "warning");
@@ -204,6 +211,7 @@ export function fireCrew(id: string) {
       m.morale = clamp(m.morale - randInt(2, 6), 0, 100);
     });
   }
+  return { success: true };
 }
 
 export function adjustCrewMoraleAll(delta: number) {

@@ -1,8 +1,7 @@
 import { CrewMember } from "../core/models";
+import { gameServices } from "../core/services";
 import { gameState } from "../core/state";
-import { fireCrew, hireCrew } from "../systems/crew";
 import { formatCrewEffects, formatTag } from "./formatters";
-import { renderState } from "./renderState";
 
 export function renderCrew() {
   const list = document.getElementById("crew-list")!;
@@ -34,11 +33,7 @@ export function renderCrew() {
     const right = document.createElement("div");
     const btnFire = document.createElement("button");
     btnFire.textContent = "Demitir";
-    btnFire.onclick = () => {
-      fireCrew(member.id);
-      renderCrew();
-      renderState();
-    };
+    btnFire.onclick = () => gameServices.actions.fireCrew(member.id);
     right.appendChild(btnFire);
 
     div.appendChild(left);
@@ -75,12 +70,7 @@ export function renderCrewCandidates() {
 
     const btn = document.createElement("button");
     btn.textContent = "Contratar";
-    btn.onclick = () => {
-      hireCrew(c.id);
-      renderCrew();
-      renderState();
-      renderCrewCandidates();
-    };
+    btn.onclick = () => gameServices.actions.hireCrew(c.id);
 
     card.appendChild(info);
     card.appendChild(btn);

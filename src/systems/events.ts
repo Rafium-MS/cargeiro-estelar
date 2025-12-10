@@ -1,8 +1,8 @@
 // src/systems/events.ts
 import { randInt, chooseRandom } from "../core/data";
 import { CrewMember, Job } from "../core/models";
+import { addLog } from "../core/services/log";
 import { gameState } from "../core/state";
-import { addLog } from "../ui/log";
 import {
   getCrewStats,
   adjustCrewMoraleRange,

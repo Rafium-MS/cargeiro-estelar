@@ -1,7 +1,8 @@
 // src/systems/shipyard.ts
+import { addLog } from "../core/services/log";
+import { ActionResult } from "../core/services/types";
 import { gameState } from "../core/state";
 import { SHIP_DEFINITIONS, ShipDefinition, getShipDefinition } from "../core/ships";
-import { addLog } from "../ui/log";
 
 const UPGRADE_BONUS = {
   hull: 20,
@@ -24,18 +25,18 @@ export function getShipyardCatalog() {
   return SHIP_DEFINITIONS;
 }
 
-export function switchShip(shipKey: string) {
+export function switchShip(shipKey: string): ActionResult {
   const ship = getShipDefinition(shipKey);
-  if (!ship) return;
+  if (!ship) return { success: false, error: "Nave não encontrada" };
 
   if (gameState.ship.key === ship.key) {
     addLog(`O ${ship.name} já é sua nave atual.`, "warning");
-    return;
+    return { success: false, error: "Nave atual" };
   }
 
   if (gameState.credits < ship.price) {
     addLog(`Créditos insuficientes para adquirir ${ship.name} (${ship.price} cr).`, "warning");
-    return;
+    return { success: false, error: "Créditos insuficientes" };
   }
 
   const upgradedStats = applyUpgrades(ship);
@@ -61,6 +62,7 @@ export function switchShip(shipKey: string) {
   gameState.crewCapacity = Math.max(desiredCrewCapacity, gameState.crew.length);
 
   addLog(`Você adquiriu o ${ship.name}! Estatísticas redefinidas com upgrades aplicados.`, "good");
+  return { success: true };
 }
 
 export function getShipTraitSummary(ship: ShipDefinition): string {

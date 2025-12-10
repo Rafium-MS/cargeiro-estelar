@@ -1,7 +1,4 @@
-import { generateCrewCandidates, rest } from "../systems/crew";
-import { refuelShip } from "../systems/fuel";
-import { generateJobs } from "../systems/jobs";
-import { renderAll, renderCrewCandidates, renderJobs } from "./index";
+import { gameServices } from "../core/services";
 
 function activateView(targetId: string) {
   const views = Array.from(document.querySelectorAll<HTMLElement>(".view"));
@@ -33,22 +30,18 @@ export function initUIBindings() {
   initNavigation();
 
   document.getElementById("btn-new-jobs")?.addEventListener("click", () => {
-    generateJobs();
-    renderJobs();
+    gameServices.actions.generateJobs();
   });
 
   document.getElementById("btn-new-candidates")?.addEventListener("click", () => {
-    generateCrewCandidates();
-    renderCrewCandidates();
+    gameServices.actions.generateCrewCandidates();
   });
 
   document.getElementById("btn-rest")?.addEventListener("click", () => {
-    rest();
-    renderAll();
+    gameServices.actions.rest();
   });
 
   document.getElementById("btn-refuel")?.addEventListener("click", () => {
-    refuelShip();
-    renderAll();
+    gameServices.actions.refuelShip();
   });
 }

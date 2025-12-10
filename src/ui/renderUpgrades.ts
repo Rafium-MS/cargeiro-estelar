@@ -1,10 +1,7 @@
 import { UpgradeType } from "../core/models";
+import { gameServices } from "../core/services";
 import { gameState } from "../core/state";
-import { addLog } from "./log";
-import { getShipyardCatalog, switchShip, getShipTraitSummary } from "../systems/shipyard";
-import { renderCrew } from "./renderCrew";
-import { renderHistory, renderState } from "./renderState";
-import { renderJobs } from "./renderJobs";
+import { getShipyardCatalog, getShipTraitSummary } from "../systems/shipyard";
 
 function getUpgradeData(type: UpgradeType) {
   const level = gameState.upgrades[type] || 0;
@@ -38,32 +35,6 @@ function getUpgradeData(type: UpgradeType) {
   return { type, name, level, cost, desc };
 }
 
-function upgradeShip(type: UpgradeType) {
-  const data = getUpgradeData(type);
-
-  if (gameState.credits < data.cost) {
-    addLog(`Créditos insuficientes para o upgrade "${data.name}".`, "warning");
-    return;
-  }
-
-  gameState.credits -= data.cost;
-  gameState.upgrades[type] = (gameState.upgrades[type] || 0) + 1;
-
-  if (type === "hull") {
-    gameState.ship.maxHull += 20;
-    gameState.ship.hull = gameState.ship.maxHull;
-  } else if (type === "cargo") {
-    gameState.ship.cargoCapacity += 8;
-  } else if (type === "fuel") {
-    gameState.ship.maxFuel += 20;
-    gameState.ship.fuel = gameState.ship.maxFuel;
-  } else if (type === "quarters") {
-    gameState.crewCapacity += 1;
-  }
-
-  renderState();
-}
-
 export function renderUpgrades() {
   const container = document.getElementById("upgrades-list")!;
   container.innerHTML = "";
@@ -87,7 +58,7 @@ export function renderUpgrades() {
 
     const btn = document.createElement("button");
     btn.textContent = "Upgrade";
-    btn.onclick = () => upgradeShip(type);
+    btn.onclick = () => gameServices.actions.upgradeShip(type);
 
     row.appendChild(info);
     row.appendChild(btn);
@@ -143,14 +114,7 @@ export function renderShipyard() {
     const isCurrent = ship.key === gameState.ship.key;
     btn.textContent = isCurrent ? "Em operação" : `Adquirir (${ship.price} cr)`;
     btn.disabled = isCurrent || gameState.credits < ship.price;
-    btn.onclick = () => {
-      switchShip(ship.key);
-      renderState();
-      renderCrew();
-      renderJobs();
-      renderHistory();
-      renderShipyard();
-    };
+    btn.onclick = () => gameServices.actions.switchShip(ship.key);
     actions.appendChild(btn);
 
     card.appendChild(header);
