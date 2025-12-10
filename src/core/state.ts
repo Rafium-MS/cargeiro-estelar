@@ -1,8 +1,8 @@
 // src/core/state.ts
 import { MAP_LOCATIONS } from "./data";
-import { getShipDefinition } from "./ships";
+import { ShipId, getShipDefinition } from "./ships";
 
-const startingShip = getShipDefinition("lv-01")!;
+const startingShip = getShipDefinition("lv01" as ShipId)!;
 
 export const gameState = {
   day: 1,
