@@ -1,6 +1,7 @@
 // src/systems/events.ts
-import { gameState } from "../core/state";
 import { randInt, chooseRandom } from "../core/data";
+import { CrewMember, Job } from "../core/models";
+import { gameState } from "../core/state";
 import { addLog } from "../ui/log";
 import {
   getCrewStats,
@@ -11,7 +12,7 @@ import {
 import { adjustReputation, checkStoryMissionTriggers } from "./story";
 import { registerMissionCompletion } from "./missionHistory";
 
-export function handleSuccessReputation(job: any) {
+export function handleSuccessReputation(job: Job) {
   const f = job.clientFactionKey;
   if (f === "authorities") {
     adjustReputation("authorities", +4);
@@ -28,7 +29,7 @@ export function handleSuccessReputation(job: any) {
   checkStoryMissionTriggers();
 }
 
-export function applyTravelEvent(job: any) {
+export function applyTravelEvent(job: Job) {
   const crewStats = getCrewStats();
   const effects = getCrewEffectModifiers();
   const rep = gameState.reputation;
@@ -115,8 +116,8 @@ export function applyTravelEvent(job: any) {
         adjustReputation("syndicate", -8);
 
         if (randInt(1, 100) <= 20 && gameState.crew.length > 0) {
-          let candidate = gameState.crew.find((m: any) => m.key === "security") || chooseRandom(gameState.crew);
-          gameState.crew = gameState.crew.filter((m: any) => m.id !== candidate.id);
+          let candidate = gameState.crew.find((m: CrewMember) => m.key === "security") || chooseRandom(gameState.crew);
+          gameState.crew = gameState.crew.filter((m: CrewMember) => m.id !== candidate.id);
           addLog(
             `${candidate.name} foi detido pelas autoridades durante a investigação do contrabando e teve que deixar a nave.`,
             "danger"
@@ -240,7 +241,7 @@ export function restAtStation() {
   gameState.credits -= totalCost;
 
   if (crewCount > 0) {
-    gameState.crew.forEach((member: any) => {
+    gameState.crew.forEach((member: CrewMember) => {
       member.fatigue = Math.max(0, member.fatigue - 30);
       member.morale = Math.min(100, member.morale + 8);
     });

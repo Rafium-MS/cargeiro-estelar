@@ -1,8 +1,9 @@
 // src/ui/log.ts
+import { LogEntry } from "../core/models";
 import { gameState } from "../core/state";
 
 export function addLog(message: string, type: "" | "danger" | "warning" | "good" = "") {
-  const entry = {
+  const entry: LogEntry = {
     day: gameState.day,
     message,
     type
@@ -16,7 +17,7 @@ export function renderLog() {
   if (!logEl) return;
 
   logEl.innerHTML = "";
-  gameState.log.forEach((entry: any) => {
+  gameState.log.forEach((entry: LogEntry) => {
     const div = document.createElement("div");
     div.className = "log-entry";
     if (entry.type === "danger") div.classList.add("danger");

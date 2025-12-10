@@ -1,5 +1,7 @@
 // src/systems/story.ts
-import { gameState, getLocationData, distanceBetween } from "../core/state";
+import { getLocationData, distanceBetween } from "../core/map";
+import { Job } from "../core/models";
+import { gameState } from "../core/state";
 import { CARGO_TYPES, randInt, clamp } from "../core/data";
 import { addLog } from "../ui/log";
 import { registerMissionCompletion } from "./missionHistory";
@@ -300,7 +302,7 @@ export function checkStoryMissionTriggers() {
 
 import { adjustCrewMoraleRange, adjustCrewFatigueAll } from "./crew";
 
-export function runStoryMissionOutcome(job: any) {
+export function runStoryMissionOutcome(job: Job) {
   job.completed = true;
 
   const baseData = {

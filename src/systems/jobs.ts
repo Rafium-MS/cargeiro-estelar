@@ -1,6 +1,8 @@
 // src/systems/jobs.ts
-import { gameState, LOCATIONS, getLocationData, distanceBetween } from "../core/state";
 import { CARGO_TYPES, randInt, chooseRandom, zoneRiskModifier } from "../core/data";
+import { CrewMember, Job } from "../core/models";
+import { LOCATIONS, getLocationData, distanceBetween } from "../core/map";
+import { gameState } from "../core/state";
 import { addLog } from "../ui/log";
 import {
   getCrewStats,
@@ -51,8 +53,8 @@ function pickFactionWeighted(originZone: string, destZone: string, cargoKey: str
 }
 
 export function generateJobs() {
-  const storyJobs = gameState.jobs.filter((j: any) => j.isStory && !j.completed);
-  const jobs: any[] = [...storyJobs];
+  const storyJobs = gameState.jobs.filter(j => j.isStory && !j.completed);
+  const jobs: Job[] = [...storyJobs];
 
   for (let i = 0; i < 4; i++) {
     const origin = gameState.location;
@@ -111,7 +113,7 @@ export function generateJobs() {
 }
 
 export function acceptJob(jobId: string) {
-  const job = gameState.jobs.find((j: any) => j.id === jobId);
+  const job = gameState.jobs.find(j => j.id === jobId);
   if (!job) return;
 
   const effectMods = getCrewEffectModifiers();
@@ -151,7 +153,7 @@ export function acceptJob(jobId: string) {
   gameState.day += 1;
 
   if (gameState.crew.length > 0) {
-    gameState.crew.forEach((member: any) => {
+    gameState.crew.forEach((member: CrewMember) => {
       const baseFatigue = 6;
       const distanceFactor = Math.floor(job.distance);
       const riskFactor = Math.floor(adjustedRiskBase / 40);
