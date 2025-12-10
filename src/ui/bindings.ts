@@ -1,6 +1,7 @@
 // src/ui/render.ts
-import { gameState } from "../core/state";
 import { MAP_LOCATIONS, FACTIONS, repStatus } from "../core/data";
+import { CrewMember, Job, UpgradeType } from "../core/models";
+import { gameState } from "../core/state";
 import { getCrewStats, fireCrew, hireCrew, generateCrewCandidates, rest } from "../systems/crew";
 import { acceptJob, generateJobs } from "../systems/jobs";
 import { addLog } from "./log";
@@ -72,7 +73,7 @@ export function renderJobs() {
   const container = document.getElementById("jobs-list")!;
   container.innerHTML = "";
 
-  gameState.jobs.forEach((job: any) => {
+  gameState.jobs.forEach((job: Job) => {
     const card = document.createElement("div");
     card.className = "job-card";
 
@@ -132,7 +133,7 @@ export function renderCrew() {
     return;
   }
 
-  gameState.crew.forEach((member: any) => {
+  gameState.crew.forEach((member: CrewMember) => {
     const div = document.createElement("div");
     div.className = "crew-member";
 
@@ -174,7 +175,7 @@ export function renderCrewCandidates() {
     return;
   }
 
-  gameState.crewCandidates.forEach((c: any) => {
+  gameState.crewCandidates.forEach((c: CrewMember) => {
     const card = document.createElement("div");
     card.className = "crew-candidate";
 
@@ -202,7 +203,7 @@ export function renderCrewCandidates() {
   });
 }
 
-function getUpgradeData(type: "hull" | "cargo" | "fuel" | "quarters") {
+function getUpgradeData(type: UpgradeType) {
   const level = gameState.upgrades[type] || 0;
 
   const baseCosts: Record<string, number> = {
@@ -234,7 +235,7 @@ function getUpgradeData(type: "hull" | "cargo" | "fuel" | "quarters") {
   return { type, name, level, cost, desc };
 }
 
-function upgradeShip(type: "hull" | "cargo" | "fuel" | "quarters") {
+function upgradeShip(type: UpgradeType) {
   const data = getUpgradeData(type);
 
   if (gameState.credits < data.cost) {
@@ -264,7 +265,7 @@ export function renderUpgrades() {
   const container = document.getElementById("upgrades-list")!;
   container.innerHTML = "";
 
-  const types: ("hull" | "cargo" | "fuel" | "quarters")[] = ["hull", "cargo", "fuel", "quarters"];
+  const types: UpgradeType[] = ["hull", "cargo", "fuel", "quarters"];
 
   types.forEach(type => {
     const data = getUpgradeData(type);

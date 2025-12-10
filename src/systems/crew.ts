@@ -1,20 +1,8 @@
 // src/systems/crew.ts
-import { gameState } from "../core/state";
 import { ROLES, NAME_POOL, randInt, chooseRandom, clamp } from "../core/data";
+import { CrewEffect, CrewMember } from "../core/models";
+import { gameState } from "../core/state";
 import { addLog } from "../ui/log";
-
-type CrewEffect = {
-  key: string;
-  name: string;
-  type: "buff" | "debuff";
-  description: string;
-  riskMod?: number; // altera chance de evento ruim
-  fuelPercent?: number; // modifica custo de combustível
-  hullDamagePercent?: number; // modifica dano ao casco
-  fatigueFlat?: number; // modifica fadiga recebida em viagens
-  bonusRoll?: number; // aumenta chance de bônus ao entregar
-  skillBonus?: Partial<Record<"pilot" | "engineer" | "security" | "logistics", number>>;
-};
 
 const CREW_EFFECT_POOL: CrewEffect[] = [
   {
@@ -83,7 +71,7 @@ const CREW_EFFECT_POOL: CrewEffect[] = [
 
 export function getCrewEffectModifiers() {
   return gameState.crew.reduce(
-    (acc: any, member: any) => {
+    (acc, member) => {
       (member.effects || []).forEach((effect: CrewEffect) => {
         acc.riskMod += effect.riskMod ?? 0;
         acc.fuelPercent += effect.fuelPercent ?? 0;
@@ -99,7 +87,7 @@ export function getCrewEffectModifiers() {
 
 export function getCrewEffectLabels() {
   const labels: string[] = [];
-  gameState.crew.forEach((member: any) => {
+  gameState.crew.forEach(member => {
     (member.effects || []).forEach((effect: CrewEffect) => {
       labels.push(`${effect.name} (${effect.type === "buff" ? "bônus" : "penalidade"})`);
     });
@@ -128,7 +116,7 @@ export function generateCrewCandidate() {
 }
 
 export function generateCrewCandidates() {
-  const candidates = [];
+  const candidates: CrewMember[] = [];
   for (let i = 0; i < 3; i++) {
     candidates.push(generateCrewCandidate());
   }
@@ -160,7 +148,7 @@ export function rest() {
   }
 
   if (gameState.crew.length > 0) {
-    gameState.crew.forEach((member: any) => {
+    gameState.crew.forEach(member => {
       const recovered = randInt(12, 22);
       member.fatigue = clamp(member.fatigue - recovered, 0, 100);
       member.morale = clamp(member.morale + 3, 0, 100);
@@ -186,7 +174,7 @@ export function rest() {
 }
 
 export function hireCrew(id: string) {
-  const candidate = gameState.crewCandidates.find((c: any) => c.id === id);
+  const candidate = gameState.crewCandidates.find(c => c.id === id);
   if (!candidate) return;
 
   if (gameState.crew.length >= gameState.crewCapacity) {
@@ -200,19 +188,19 @@ export function hireCrew(id: string) {
   }
 
   gameState.crew.push(candidate);
-  gameState.crewCandidates = gameState.crewCandidates.filter((c: any) => c.id !== id);
+  gameState.crewCandidates = gameState.crewCandidates.filter(c => c.id !== id);
   addLog(`Você contratou ${candidate.name} como ${candidate.role}.`, "good");
 }
 
 export function fireCrew(id: string) {
-  const member = gameState.crew.find((m: any) => m.id === id);
+  const member = gameState.crew.find(m => m.id === id);
   if (!member) return;
 
-  gameState.crew = gameState.crew.filter((m: any) => m.id !== id);
+  gameState.crew = gameState.crew.filter(m => m.id !== id);
   addLog(`Você demitiu ${member.name} (${member.role}). O clima a bordo mudou.`, "warning");
 
   if (gameState.crew.length > 0) {
-    gameState.crew.forEach((m: any) => {
+    gameState.crew.forEach(m => {
       m.morale = clamp(m.morale - randInt(2, 6), 0, 100);
     });
   }
@@ -220,14 +208,14 @@ export function fireCrew(id: string) {
 
 export function adjustCrewMoraleAll(delta: number) {
   if (gameState.crew.length === 0) return;
-  gameState.crew.forEach((member: any) => {
+  gameState.crew.forEach(member => {
     member.morale = clamp(member.morale + delta, 0, 100);
   });
 }
 
 export function adjustCrewMoraleRange(minDelta: number, maxDelta: number) {
   if (gameState.crew.length === 0) return;
-  gameState.crew.forEach((member: any) => {
+  gameState.crew.forEach(member => {
     const delta = randInt(minDelta, maxDelta);
     member.morale = clamp(member.morale + delta, 0, 100);
   });
@@ -235,7 +223,7 @@ export function adjustCrewMoraleRange(minDelta: number, maxDelta: number) {
 
 export function adjustCrewFatigueAll(delta: number) {
   if (gameState.crew.length === 0) return;
-  gameState.crew.forEach((member: any) => {
+  gameState.crew.forEach(member => {
     member.fatigue = clamp(member.fatigue + delta, 0, 100);
   });
 }
@@ -256,7 +244,7 @@ export function getCrewStats() {
   let totalMorale = 0;
   let totalFatigue = 0;
 
-  gameState.crew.forEach((member: any) => {
+  gameState.crew.forEach(member => {
     stats.salaryPerDay += member.salaryPerDay;
     totalMorale += member.morale;
     totalFatigue += member.fatigue;
@@ -307,7 +295,7 @@ export function checkMoraleEvents(context: "trip" | "rest") {
         adjustCrewMoraleAll(+10);
       } else {
         const deserter = chooseRandom(gameState.crew);
-        gameState.crew = gameState.crew.filter((m: any) => m.id !== deserter.id);
+        gameState.crew = gameState.crew.filter(m => m.id !== deserter.id);
         addLog(
           `${deserter.name} abandonou o cargueiro por falta de confiança no comando. O restante da tripulação está abalado.`,
           "danger"
@@ -335,8 +323,8 @@ export function checkMoraleEvents(context: "trip" | "rest") {
 
       member.morale = clamp(member.morale + 12, 0, 100);
       gameState.crew
-        .filter((m: any) => m.id !== member.id)
-        .forEach((m: any) => {
+        .filter(m => m.id !== member.id)
+        .forEach(m => {
           m.morale = clamp(m.morale + randInt(-2, +3), 0, 100);
         });
     }
