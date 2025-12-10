@@ -1,0 +1,102 @@
+[
+  {
+    "id": "mula",
+    "name": "Pica-Pau Classe Mula",
+    "silhouette": "curta, compacta e assimétrica, com módulos laterais improvisados",
+    "frontView": "frontal quase retangular, cockpit estreito ao centro com janelas trapezoidais pequenas e módulos de carga laterais levemente desalinhados",
+    "sideView": "corpo tubular curto com seções irregulares, placas remendadas em tons diferentes e canos aparentes",
+    "topView": "dois módulos de carga soldados aos lados do corpo principal, chamuscados próximos aos motores e antena torta no topo",
+    "colorPalette": ["cinza opaco claro", "cinza opaco escuro", "amarelo ferrugem", "preto óleo"],
+    "styleNotes": "nave remendada, cheia de soldas visíveis, adesivos velhos de companhias falidas e iluminação externa fraca que pisca ocasionalmente"
+  },
+  {
+    "id": "lv01",
+    "name": "Cargueiro LV-01",
+    "silhouette": "simétrica e compacta, fuselagem frontal arredondada e módulo traseiro quadrado",
+    "frontView": "cockpit largo com três janelas grandes levemente inclinadas e faixas azuis industriais nas laterais",
+    "sideView": "fuselagem cilíndrica conectada a um compartimento de carga retangular, com entradas de ventilação circulares",
+    "topView": "painéis retangulares bem alinhados ao longo do casco e dois motores cilíndricos presos por braços simétricos",
+    "colorPalette": ["cinza claro", "azul industrial", "preto técnico"],
+    "styleNotes": "visual limpo e funcional, sem grandes detalhes chamativos, projetado para inspirar confiança e manutenção barata"
+  },
+  {
+    "id": "caelum-runner",
+    "name": "Caelum Runner",
+    "silhouette": "alongada e afilada, com asas curtas e perfil esportivo",
+    "frontView": "cockpit baixo com um visor contínuo e estreito, nariz pontiagudo e pequenas entradas de ar laterais",
+    "sideView": "corpo suavemente curvo com cauda elevada, motores alinhados como jatos compactos",
+    "topView": "faixas brancas de corrida correndo do nariz até a cauda, com motores posicionados como asas delta curtas",
+    "colorPalette": ["azul cobalto", "branco puro", "cinza cromado"],
+    "styleNotes": "parece um híbrido entre nave de carga leve e caça esportivo, com acabamento polido e linhas agressivas"
+  },
+  {
+    "id": "orion-bulk",
+    "name": "Orion-Bulk",
+    "silhouette": "grande bloco retangular de carga com nariz estreito projetado",
+    "frontView": "cockpit frontal estreito lembrando a frente de um trem, diversas janelas grossas e reforços de metal expostos",
+    "sideView": "comprido compartimento de carga retangular com vigas e costelas externas, trilhos e cabos ao longo da lateral",
+    "topView": "superfície ampla de placas contínuas com trilhos para contêineres e quatro motores grandes no extremo traseiro",
+    "colorPalette": ["branco industrial", "cinza naval", "amarelo de segurança"],
+    "styleNotes": "visual pesado e utilitário, com estética próxima a navios cargueiros marítimos traduzidos para o espaço"
+  },
+  {
+    "id": "draconis-dragon",
+    "name": "Dragão de Draconis",
+    "silhouette": "triangular, agressiva e musculosa, com linhas de caça pesada",
+    "frontView": "cockpit estreito com viseira vermelha, placas blindadas espessas e pequenas aletas que lembram chifres",
+    "sideView": "perfil inclinado com três motores grandes, placas sobrepostas como escamas ao longo do casco",
+    "topView": "desenho estilizado de dragão pintado na parte superior, reforços metálicos longitudinais e entradas de resfriamento expostas",
+    "colorPalette": ["vermelho escuro", "preto fosco", "metal escurecido"],
+    "styleNotes": "nave que transmite agressividade e prestígio, típica de mercadores pesados que querem ser levados a sério"
+  },
+  {
+    "id": "kaelum-long-haul",
+    "name": "Kaelum Long-Haul",
+    "silhouette": "segmentada e modular, composta de vários blocos conectados",
+    "frontView": "cabine pequena no centro com dois módulos de carga retangulares nas laterais e luzes verdes suaves",
+    "sideView": "corpo dividido em seções plugáveis com tanques externos marcados com códigos técnicos e trilhos laterais",
+    "topView": "layout organizado de módulos, motores alongados em linha e compartimentos padronizados de carga",
+    "colorPalette": ["verde militar suave", "bege técnico", "cinza escuro"],
+    "styleNotes": "visual extremamente funcional, pensado para manutenção rápida e customização de acordo com a rota"
+  },
+  {
+    "id": "vega-sentinel",
+    "name": "Vega Sentinel",
+    "silhouette": "imponente e simétrica, com ombreiras blindadas sobre os motores",
+    "frontView": "ponte de comando com canopy dourado anti-radiação, flanqueada por placas blindadas robustas",
+    "sideView": "casco volumoso com placas espessas, motores reforçados com anéis de dissipação e antenas rígidas",
+    "topView": "simetria quase perfeita, brasão corporativo em destaque e contornos luminosos azuis desenhando a silhueta",
+    "colorPalette": ["prata metálico", "ouro fosco", "azul frio"],
+    "styleNotes": "mistura de nave corporativa de luxo com navio de escolta, passa sensação de poder e status"
+  },
+  {
+    "id": "shadow-route",
+    "name": "Shadow-Route",
+    "silhouette": "compacta, lisa e discreta, com poucos detalhes externos",
+    "frontView": "vidros fumê escuros, linha frontal simples e minimalista, quase sem relevos",
+    "sideView": "fuselagem lisa demais, com aletas retráteis e volumes ligeiramente irregulares sugerindo compartimentos ocultos",
+    "topView": "painéis planos e padronizados, quase sem antenas ou estruturas aparentes, aparência intencionalmente genérica",
+    "colorPalette": ["cinza-grafite fosco", "preto stealth", "detalhe roxo muito discreto"],
+    "styleNotes": "nave feita para passar despercebida em qualquer porto, com visual que não chama a atenção nem de sensores nem de olhos humanos"
+  },
+  {
+    "id": "leviathan",
+    "name": "Leviatã de Orion Prime",
+    "silhouette": "colossal, composta por três blocos principais conectados por passarelas",
+    "frontView": "parede de metal com fileiras de janelas minúsculas, várias camadas de decks visíveis",
+    "sideView": "três módulos gigantes conectados, enormes portas de carga laterais e janelas que revelam corredores internos iluminados",
+    "topView": "plataforma maciça com motores em dois níveis e uma floresta de luzes e estruturas técnicas",
+    "colorPalette": ["prata cetim", "dourado industrial", "azul profundo"],
+    "styleNotes": "parece mais uma estação espacial móvel do que uma nave, dominando visualmente qualquer doca em que esteja atracada"
+  },
+  {
+    "id": "frontier-ghost",
+    "name": "Fantasma da Fronteira",
+    "silhouette": "assimétrica, orgânica e levemente sinistra",
+    "frontView": "ponte de comando afundada, painéis hexagonais que emitem brilho roxo suave e contornos que lembram cicatrizes",
+    "sideView": "curvas estranhas com estruturas externas parecidas com costelas, motores alongados quase sem emissão visível",
+    "topView": "padrões irregulares, seções que parecem reconstruídas, áreas queimadas e marcas antigas apagadas",
+    "colorPalette": ["preto profundo", "roxo espectral", "cinza fantasmagórico"],
+    "styleNotes": "visual de nave lendária e possivelmente amaldiçoada, com tecnologia e reformas de origem pouco clara, quase viva"
+  }
+]
