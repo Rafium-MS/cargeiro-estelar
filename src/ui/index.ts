@@ -7,6 +7,7 @@ import { renderCrew, renderCrewCandidates } from "./renderCrew";
 import { renderHistory, renderMap, renderReputation, renderState } from "./renderState";
 import { renderJobs } from "./renderJobs";
 import { renderShipyard } from "./renderUpgrades";
+import { renderLog } from "./log";
 
 export function renderAll() {
   renderState();
@@ -15,4 +16,5 @@ export function renderAll() {
   renderJobs();
   renderShipyard();
   renderHistory();
+  renderLog();
 }

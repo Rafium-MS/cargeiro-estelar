@@ -1,9 +1,9 @@
 // src/systems/story.ts
+import { CARGO_TYPES, randInt, clamp } from "../core/data";
 import { getLocationData, distanceBetween } from "../core/map";
 import { Job } from "../core/models";
+import { addLog } from "../core/services/log";
 import { gameState } from "../core/state";
-import { CARGO_TYPES, randInt, clamp } from "../core/data";
-import { addLog } from "../ui/log";
 import { registerMissionCompletion } from "./missionHistory";
 
 export function adjustReputation(factionKey: string, delta: number) {

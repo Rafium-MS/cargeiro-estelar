@@ -1,9 +1,7 @@
 import { Job } from "../core/models";
+import { gameServices } from "../core/services";
 import { gameState } from "../core/state";
-import { acceptJob } from "../systems/jobs";
 import { formatTag } from "./formatters";
-import { renderCrew } from "./renderCrew";
-import { renderState } from "./renderState";
 
 export function renderJobs() {
   const container = document.getElementById("jobs-list")!;
@@ -43,12 +41,7 @@ export function renderJobs() {
 
     const button = document.createElement("button");
     button.textContent = "Aceitar trabalho";
-    button.onclick = () => {
-      acceptJob(job.id);
-      renderState();
-      renderCrew();
-      renderJobs();
-    };
+    button.onclick = () => gameServices.actions.acceptJob(job.id);
 
     card.appendChild(main);
     card.appendChild(meta);

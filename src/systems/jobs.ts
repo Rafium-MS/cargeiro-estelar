@@ -1,9 +1,10 @@
 // src/systems/jobs.ts
 import { CARGO_TYPES, randInt, chooseRandom, zoneRiskModifier } from "../core/data";
 import { CrewMember, Job } from "../core/models";
+import { addLog } from "../core/services/log";
+import { ActionResult } from "../core/services/types";
 import { LOCATIONS, getLocationData, distanceBetween } from "../core/map";
 import { gameState } from "../core/state";
-import { addLog } from "../ui/log";
 import {
   getCrewStats,
   adjustCrewMoraleRange,
@@ -52,7 +53,7 @@ function pickFactionWeighted(originZone: string, destZone: string, cargoKey: str
   return "syndicate";
 }
 
-export function generateJobs() {
+export function generateJobs(): ActionResult {
   const storyJobs = gameState.jobs.filter(j => j.isStory && !j.completed);
   const jobs: Job[] = [...storyJobs];
 
@@ -110,23 +111,24 @@ export function generateJobs() {
   }
 
   gameState.jobs = jobs;
+  return { success: true };
 }
 
-export function acceptJob(jobId: string) {
+export function acceptJob(jobId: string): ActionResult {
   const job = gameState.jobs.find(j => j.id === jobId);
-  if (!job) return;
+  if (!job) return { success: false, error: "Trabalho não encontrado" };
 
   const effectMods = getCrewEffectModifiers();
   const effectiveFuelCost = Math.max(1, Math.round(job.fuelCost * (1 + (effectMods.fuelPercent ?? 0) / 100)));
 
   if (gameState.ship.fuel < effectiveFuelCost) {
     addLog("Combustível insuficiente para essa rota. Abasteça ou escolha um trabalho mais perto.", "warning");
-    return;
+    return { success: false, error: "Combustível insuficiente" };
   }
 
   if (job.cargoAmount > gameState.ship.cargoCapacity) {
     addLog("Sua nave não tem capacidade de carga suficiente para esse trabalho.", "warning");
-    return;
+    return { success: false, error: "Capacidade de carga insuficiente" };
   }
 
   const crewStats = getCrewStats();
@@ -181,4 +183,5 @@ export function acceptJob(jobId: string) {
 
   generateJobs();
   checkMoraleEvents("trip");
+  return { success: true };
 }

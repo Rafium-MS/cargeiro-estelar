@@ -1,14 +1,24 @@
 // src/main.ts
+import { gameServices } from "./core/services";
+import { addLog } from "./core/services/log";
 import { renderAll } from "./ui";
-import { generateJobs } from "./systems/jobs";
 import { initUIBindings } from "./ui/bindings";
-import { addLog } from "./ui/log";
+import { renderLog } from "./ui/log";
 
 function initGame() {
-  addLog("Bem-vindo ao comando do Cargueiro LV-01. Sua fama no setor vai destravar missões especiais com história própria.", "good");
+  gameServices.subscribe(() => {
+    renderAll();
+    renderLog();
+  });
+
+  addLog(
+    "Bem-vindo ao comando do Cargueiro LV-01. Sua fama no setor vai destravar missões especiais com história própria.",
+    "good"
+  );
+
   renderAll();
-  generateJobs();
-  renderAll();
+  renderLog();
+  gameServices.actions.generateJobs();
   initUIBindings();
 }
 
