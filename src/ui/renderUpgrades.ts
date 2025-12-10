@@ -1,0 +1,163 @@
+import { UpgradeType } from "../core/models";
+import { gameState } from "../core/state";
+import { addLog } from "./log";
+import { getShipyardCatalog, switchShip, getShipTraitSummary } from "../systems/shipyard";
+import { renderCrew } from "./renderCrew";
+import { renderHistory, renderState } from "./renderState";
+import { renderJobs } from "./renderJobs";
+
+function getUpgradeData(type: UpgradeType) {
+  const level = gameState.upgrades[type] || 0;
+
+  const baseCosts: Record<string, number> = {
+    hull: 500,
+    cargo: 400,
+    fuel: 450,
+    quarters: 600
+  };
+
+  const perLevel = 250;
+  const cost = baseCosts[type] + level * perLevel;
+
+  let name: string;
+  let desc: string;
+  if (type === "hull") {
+    name = "Reforço de Casco";
+    desc = "+20 à integridade máxima do casco, totalmente reparado no upgrade.";
+  } else if (type === "cargo") {
+    name = "Módulos de Carga";
+    desc = "+8 de capacidade de carga.";
+  } else if (type === "fuel") {
+    name = "Tanque Estendido";
+    desc = "+20 de combustível máximo (tanque cheio ao instalar).";
+  } else {
+    name = "Alojamentos Extras";
+    desc = "+1 de capacidade de tripulação.";
+  }
+
+  return { type, name, level, cost, desc };
+}
+
+function upgradeShip(type: UpgradeType) {
+  const data = getUpgradeData(type);
+
+  if (gameState.credits < data.cost) {
+    addLog(`Créditos insuficientes para o upgrade "${data.name}".`, "warning");
+    return;
+  }
+
+  gameState.credits -= data.cost;
+  gameState.upgrades[type] = (gameState.upgrades[type] || 0) + 1;
+
+  if (type === "hull") {
+    gameState.ship.maxHull += 20;
+    gameState.ship.hull = gameState.ship.maxHull;
+  } else if (type === "cargo") {
+    gameState.ship.cargoCapacity += 8;
+  } else if (type === "fuel") {
+    gameState.ship.maxFuel += 20;
+    gameState.ship.fuel = gameState.ship.maxFuel;
+  } else if (type === "quarters") {
+    gameState.crewCapacity += 1;
+  }
+
+  renderState();
+}
+
+export function renderUpgrades() {
+  const container = document.getElementById("upgrades-list")!;
+  container.innerHTML = "";
+
+  const types: UpgradeType[] = ["hull", "cargo", "fuel", "quarters"];
+
+  types.forEach(type => {
+    const data = getUpgradeData(type);
+
+    const row = document.createElement("div");
+    row.className = "upgrade-row";
+
+    const info = document.createElement("div");
+    info.innerHTML = `
+      <div class="upgrade-info-main">${data.name} (Nível ${data.level})</div>
+      <div class="upgrade-info-meta">
+        Custo: ${data.cost} cr<br>
+        ${data.desc}
+      </div>
+    `;
+
+    const btn = document.createElement("button");
+    btn.textContent = "Upgrade";
+    btn.onclick = () => upgradeShip(type);
+
+    row.appendChild(info);
+    row.appendChild(btn);
+    container.appendChild(row);
+  });
+}
+
+export function renderShipyard() {
+  const container = document.getElementById("shipyard-list");
+  if (!container) return;
+
+  container.innerHTML = "";
+  const catalog = getShipyardCatalog();
+
+  catalog.forEach(ship => {
+    const card = document.createElement("div");
+    card.className = "ship-card";
+
+    const header = document.createElement("div");
+    header.className = "ship-card-header";
+    header.innerHTML = `
+      <div>
+        <div class="ship-name">${ship.name}</div>
+        <div class="small">Tier ${ship.tier}</div>
+      </div>
+      <div class="tag">${ship.price} cr</div>
+    `;
+
+    const desc = document.createElement("div");
+    desc.className = "ship-card-desc";
+    desc.textContent = ship.description;
+
+    const stats = document.createElement("div");
+    stats.className = "ship-card-stats";
+    const cargoText = ship.smugglerHold
+      ? `${ship.cargo}u (+${ship.smugglerHold}u ocultas)`
+      : `${ship.cargo}u`;
+    stats.textContent = `Carga ${cargoText} · Casco ${ship.hull} · Combustível ${ship.fuel} · Tripulação ${ship.crew}`;
+
+    const traits = document.createElement("div");
+    traits.className = "ship-card-traits";
+    traits.textContent = getShipTraitSummary(ship);
+    if (ship.unlockHint) {
+      const hint = document.createElement("div");
+      hint.className = "ship-card-hint";
+      hint.textContent = ship.unlockHint;
+      traits.appendChild(hint);
+    }
+
+    const actions = document.createElement("div");
+    actions.className = "ship-card-actions";
+    const btn = document.createElement("button");
+    const isCurrent = ship.key === gameState.ship.key;
+    btn.textContent = isCurrent ? "Em operação" : `Adquirir (${ship.price} cr)`;
+    btn.disabled = isCurrent || gameState.credits < ship.price;
+    btn.onclick = () => {
+      switchShip(ship.key);
+      renderState();
+      renderCrew();
+      renderJobs();
+      renderHistory();
+      renderShipyard();
+    };
+    actions.appendChild(btn);
+
+    card.appendChild(header);
+    card.appendChild(desc);
+    card.appendChild(stats);
+    card.appendChild(traits);
+    card.appendChild(actions);
+    container.appendChild(card);
+  });
+}

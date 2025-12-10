@@ -1,5 +1,5 @@
 // src/main.ts
-import { renderAll } from "./ui/render";
+import { renderAll } from "./ui";
 import { generateJobs } from "./systems/jobs";
 import { initUIBindings } from "./ui/bindings";
 import { addLog } from "./ui/log";
