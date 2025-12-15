@@ -16,6 +16,7 @@ import {
 import { applyTravelEvent } from "./events";
 import { factionPayMultiplier } from "./story";
 import { runStoryMissionOutcome } from "./story";
+import { estimateMaintenanceCost } from "./economy";
 
 function pickCargoTypeWeighted() {
   const roll = randInt(1, 100);
@@ -107,7 +108,8 @@ export function generateJobs(): ActionResult {
         clientFactionKey === "authorities" ? "Autoridades" :
         clientFactionKey === "corporations" ? "Corporações" :
         "Sindicato",
-      isStory: false
+      isStory: false,
+      maintenanceCost: estimateMaintenanceCost({ riskBase, distance })
     });
   }
 

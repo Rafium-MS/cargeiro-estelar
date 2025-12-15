@@ -1,6 +1,8 @@
 import { Job } from "../core/models";
 import { gameServices } from "../core/services";
 import { gameState } from "../core/state";
+import { calculateJobEconomics } from "../systems/economy";
+import { getFuelPrice, getPortFee } from "../core/economy";
 import { formatTag } from "./formatters";
 
 export function renderJobs() {
@@ -10,6 +12,12 @@ export function renderJobs() {
   gameState.jobs.forEach((job: Job) => {
     const card = document.createElement("div");
     card.className = "job-card";
+
+    const economics = calculateJobEconomics(job);
+    const fuelPrice = getFuelPrice(job.origin as Parameters<typeof getFuelPrice>[0]);
+    const portFee = getPortFee(job.destinationZone as Parameters<typeof getPortFee>[0]);
+
+    const formatCredits = (value: number) => value.toLocaleString("pt-BR");
 
     const main = document.createElement("div");
     main.className = "job-main";
@@ -39,12 +47,26 @@ export function renderJobs() {
       Combustível: ${job.fuelCost} · Risco base: ${job.riskBase}%
     `;
 
+    const economy = document.createElement("div");
+    economy.className = "job-economy";
+    const netClass = economics.netProfit < 0 ? "negative" : "";
+    economy.innerHTML = `
+      <div class="economy-row"><span>💰 Pagamento</span><span>${formatCredits(economics.payment)} cr</span></div>
+      <div class="economy-row"><span>⛽ Combustível</span><span>-${formatCredits(economics.fuelCost)} cr</span></div>
+      <div class="economy-row"><span>🧑‍✈️ Tripulação</span><span>-${formatCredits(economics.crewSalaries)} cr</span></div>
+      <div class="economy-row"><span>⚓ Taxa portuária</span><span>-${formatCredits(economics.portFee)} cr</span></div>
+      <div class="economy-row"><span>🛠️ Manutenção</span><span>-${formatCredits(economics.maintenanceCost)} cr</span></div>
+      <div class="economy-row net ${netClass}"><span>Lucro líquido</span><span>${formatCredits(economics.netProfit)} cr</span></div>
+      <div class="small">⛽ Preço em ${job.origin}: ${fuelPrice} cr/un · Docagem em ${job.destinationZone}: ${portFee} cr</div>
+    `;
+
     const button = document.createElement("button");
     button.textContent = "Aceitar trabalho";
     button.onclick = () => gameServices.actions.acceptJob(job.id);
 
     card.appendChild(main);
     card.appendChild(meta);
+    card.appendChild(economy);
     card.appendChild(button);
     container.appendChild(card);
   });

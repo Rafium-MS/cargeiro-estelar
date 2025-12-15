@@ -80,6 +80,7 @@ export type Job = {
   storyTitle?: string;
   storySummary?: string;
   completed?: boolean;
+  maintenanceCost?: number;
 };
 
 export type LogEntry = {
