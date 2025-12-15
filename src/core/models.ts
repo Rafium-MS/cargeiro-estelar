@@ -10,6 +10,12 @@ export type UpgradeType = "hull" | "cargo" | "fuel" | "quarters";
 
 export type UpgradeState = Record<UpgradeType, number>;
 
+export type ProgressionState = {
+  unlockedShips: string[];
+  unlockedUpgrades: string[];
+  milestonesCompleted: string[];
+};
+
 export type Ship = {
   key: ShipId;
   name: string;
@@ -121,4 +127,5 @@ export type GameState = {
   reputation: Reputation;
   storyFlags: StoryFlags;
   missionHistory: MissionHistoryEntry[];
+  progression: ProgressionState;
 };

@@ -4,6 +4,7 @@ import { addLog } from "../core/services/log";
 import { renderAll } from "../ui";
 import { initUIBindings } from "../ui/bindings";
 import { renderLog } from "../ui/log";
+import { evaluateMilestones } from "../systems/progression";
 
 export type GameContext = {
   services: typeof gameServices;
@@ -44,6 +45,8 @@ export class GameApp {
       renderAll();
       renderLog();
     });
+
+    evaluateMilestones();
 
     addLog(
       "Bem-vindo ao comando do Cargueiro LV-01. Sua fama no setor vai destravar missões especiais com história própria.",

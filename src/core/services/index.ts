@@ -8,12 +8,14 @@ import { switchShip } from "../../systems/shipyard";
 import { addLog } from "./log";
 import { UpgradeType } from "../models";
 import { persistGameState } from "../dataLoader";
+import { evaluateMilestones } from "../../systems/progression";
 
 type GameListener = StateListener<typeof gameState>;
 
 const listeners: GameListener[] = [];
 
 function notify() {
+  evaluateMilestones();
   listeners.forEach(listener => listener(gameState));
   persistGameState(gameState);
 }
