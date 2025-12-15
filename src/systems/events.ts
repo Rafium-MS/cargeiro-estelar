@@ -11,6 +11,7 @@ import {
 } from "./crew";
 import { adjustReputation, checkStoryMissionTriggers } from "./story";
 import { registerMissionCompletion } from "./missionHistory";
+import { applyJobEconomics } from "./economy";
 
 export function handleSuccessReputation(job: Job) {
   const f = job.clientFactionKey;
@@ -102,10 +103,10 @@ export function applyTravelEvent(job: Job) {
 
         const loss = Math.floor(job.pay * lossPercent / 100);
         const received = Math.max(0, job.pay - loss);
-        gameState.credits += received;
+        const economics = applyJobEconomics(job, received);
 
         addLog(
-          `Fiscalização pesada em ${job.destination}! Parte do contrabando foi confiscado. Você perdeu ${loss} créditos em mercadoria e subornos.`,
+          `Fiscalização pesada em ${job.destination}! Parte do contrabando foi confiscado. Você perdeu ${loss} créditos em mercadoria e subornos. Taxas/ajustes: -${economics.portFee} cr docagem, -${economics.maintenanceCost} cr manutenção, -${economics.fuelCost} cr combustível. Lucro líquido: ${economics.netProfit} cr.`,
           "danger"
         );
 
@@ -134,9 +135,9 @@ export function applyTravelEvent(job: Job) {
 
         const loss = Math.floor(job.pay * lossPercent / 100);
         const received = job.pay - loss;
-        gameState.credits += received;
+        const economics = applyJobEconomics(job, received);
         addLog(
-          `Inspeção em ${job.destination} identificou danos na carga frágil. Você teve que reembolsar ${loss} créditos ao cliente.`,
+          `Inspeção em ${job.destination} identificou danos na carga frágil. Você teve que reembolsar ${loss} créditos ao cliente. Custos locais: combustível -${economics.fuelCost} cr, taxa portuária -${economics.portFee} cr, manutenção -${economics.maintenanceCost} cr. Lucro líquido: ${economics.netProfit} cr.`,
           "warning"
         );
         adjustCrewMoraleRange(-3, -1);
@@ -152,9 +153,9 @@ export function applyTravelEvent(job: Job) {
 
         const loss = Math.floor(job.pay * lossPercent / 100);
         const received = job.pay - loss;
-        gameState.credits += received;
+        const economics = applyJobEconomics(job, received);
         addLog(
-          `Fiscalização surpresa em ${job.destination}. Você teve que pagar ${loss} créditos em taxas e multas.`,
+          `Fiscalização surpresa em ${job.destination}. Você teve que pagar ${loss} créditos em taxas e multas. Taxa portuária: -${economics.portFee} cr, manutenção preventiva: -${economics.maintenanceCost} cr, combustível gasto: -${economics.fuelCost} cr. Lucro líquido: ${economics.netProfit} cr.`,
           "warning"
         );
         adjustCrewMoraleRange(-4, -1);
@@ -208,9 +209,9 @@ export function applyTravelEvent(job: Job) {
     const baseBonus = randInt(100, 300);
     const extraByLogistics = getCrewStats().logistics * randInt(10, 25);
     const bonus = baseBonus + extraByLogistics;
-    gameState.credits += job.pay + bonus;
+    const economics = applyJobEconomics(job, job.pay + bonus);
     addLog(
-      `Cliente (${job.clientFactionShort}) em ${job.destination} adorou o serviço (${job.cargoType.name}) e deu uma gorjeta de ${bonus} créditos!`,
+      `Cliente (${job.clientFactionShort}) em ${job.destination} adorou o serviço (${job.cargoType.name}) e deu uma gorjeta de ${bonus} créditos! Custos aplicados: combustível -${economics.fuelCost} cr, taxa portuária -${economics.portFee} cr, manutenção -${economics.maintenanceCost} cr. Lucro líquido: ${economics.netProfit} cr.`,
       "good"
     );
     adjustCrewMoraleRange(+5, +10);
@@ -218,9 +219,9 @@ export function applyTravelEvent(job: Job) {
     handleSuccessReputation(job);
     registerOutcome(job.pay + bonus);
   } else {
-    gameState.credits += job.pay;
+    const economics = applyJobEconomics(job, job.pay);
     addLog(
-      `Entrega em ${job.destination} concluída. Você recebeu ${job.pay} créditos (${job.cargoType.name}) para ${job.clientFactionShort}.`,
+      `Entrega em ${job.destination} concluída. Você recebeu ${job.pay} créditos (${job.cargoType.name}) para ${job.clientFactionShort}. Custos da rota: combustível -${economics.fuelCost} cr, taxa portuária -${economics.portFee} cr, manutenção -${economics.maintenanceCost} cr. Lucro líquido: ${economics.netProfit} cr.`,
       "good"
     );
     adjustCrewMoraleRange(+1, +3);

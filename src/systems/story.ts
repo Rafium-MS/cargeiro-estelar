@@ -5,6 +5,7 @@ import { Job } from "../core/models";
 import { addLog } from "../core/services/log";
 import { gameState } from "../core/state";
 import { registerMissionCompletion } from "./missionHistory";
+import { applyJobEconomics, estimateMaintenanceCost } from "./economy";
 
 export function adjustReputation(factionKey: string, delta: number) {
   if (!(factionKey in gameState.reputation)) return;
@@ -31,6 +32,16 @@ export function factionPayMultiplier(factionKey: string): number {
   return mult;
 }
 
+function settleStoryEconomy(job: Job, payment: number) {
+  const economics = applyJobEconomics(job, payment);
+  const note =
+    ` [Economia] Pagamento ${payment} cr · Combustível -${economics.fuelCost} cr · ` +
+    `Taxa portuária -${economics.portFee} cr · Manutenção -${economics.maintenanceCost} cr · ` +
+    `Lucro líquido ${economics.netProfit} cr.`;
+
+  return { economics, note };
+}
+
 export function spawnStoryJob(storyId: string) {
   const origin = gameState.location;
 
@@ -44,6 +55,8 @@ export function spawnStoryJob(storyId: string) {
     const basePay = 1200;
     const pay = basePay + Math.round(distance * 35);
 
+    const riskBase = 55;
+
     const job = {
       id: "story_auth1_" + Date.now(),
       origin,
@@ -52,7 +65,7 @@ export function spawnStoryJob(storyId: string) {
       basePay,
       pay,
       fuelCost: 10 + Math.round(distance * 2),
-      riskBase: 55,
+      riskBase,
       cargoType,
       distance,
       originZone: originData.zone,
@@ -64,7 +77,8 @@ export function spawnStoryJob(storyId: string) {
       storyId: "authMission1",
       storyTitle: "Operação Rede Limpa",
       storySummary: "Comboio de isca para ajudar as Autoridades a desmontar uma rota de piratas.",
-      completed: false
+      completed: false,
+      maintenanceCost: estimateMaintenanceCost({ riskBase, distance })
     };
 
     gameState.jobs.unshift(job);
@@ -80,6 +94,8 @@ export function spawnStoryJob(storyId: string) {
     const basePay = 1400;
     const pay = basePay + Math.round(distance * 40);
 
+    const riskBase = 45;
+
     const job = {
       id: "story_corp1_" + Date.now(),
       origin,
@@ -88,7 +104,7 @@ export function spawnStoryJob(storyId: string) {
       basePay,
       pay,
       fuelCost: 8 + Math.round(distance * 2),
-      riskBase: 45,
+      riskBase,
       cargoType,
       distance,
       originZone: originData.zone,
@@ -100,7 +116,8 @@ export function spawnStoryJob(storyId: string) {
       storyId: "corpMission1",
       storyTitle: "Contrato VIP Experimental",
       storySummary: "Transporte de protótipos experimentais para um laboratório de alto nível.",
-      completed: false
+      completed: false,
+      maintenanceCost: estimateMaintenanceCost({ riskBase, distance })
     };
 
     gameState.jobs.unshift(job);
@@ -116,6 +133,8 @@ export function spawnStoryJob(storyId: string) {
     const basePay = 1600;
     const pay = basePay + Math.round(distance * 50);
 
+    const riskBase = 70;
+
     const job = {
       id: "story_syn1_" + Date.now(),
       origin,
@@ -124,7 +143,7 @@ export function spawnStoryJob(storyId: string) {
       basePay,
       pay,
       fuelCost: 12 + Math.round(distance * 2),
-      riskBase: 70,
+      riskBase,
       cargoType,
       distance,
       originZone: originData.zone,
@@ -136,7 +155,8 @@ export function spawnStoryJob(storyId: string) {
       storyId: "syndMission1",
       storyTitle: "Golpe da Rota Fantasma",
       storySummary: "Uma única viagem carregada de contrabando para consolidar sua fama no submundo.",
-      completed: false
+      completed: false,
+      maintenanceCost: estimateMaintenanceCost({ riskBase, distance })
     };
 
     gameState.jobs.unshift(job);
@@ -152,6 +172,8 @@ export function spawnStoryJob(storyId: string) {
     const basePay = 1800;
     const pay = basePay + Math.round(distance * 45);
 
+    const riskBase = 68;
+
     const job = {
       id: "story_auth2_" + Date.now(),
       origin,
@@ -160,7 +182,7 @@ export function spawnStoryJob(storyId: string) {
       basePay,
       pay,
       fuelCost: 12 + Math.round(distance * 2.5),
-      riskBase: 68,
+      riskBase,
       cargoType,
       distance,
       originZone: originData.zone,
@@ -172,7 +194,8 @@ export function spawnStoryJob(storyId: string) {
       storyId: "authMission2",
       storyTitle: "Operação Guarda Solar",
       storySummary: "Entrega sigilosa de sensores para montar um cordão de vigilância anti-pirata. Expectativa de forte fiscalização.",
-      completed: false
+      completed: false,
+      maintenanceCost: estimateMaintenanceCost({ riskBase, distance })
     };
 
     gameState.jobs.unshift(job);
@@ -188,6 +211,8 @@ export function spawnStoryJob(storyId: string) {
     const basePay = 1900;
     const pay = basePay + Math.round(distance * 55);
 
+    const riskBase = 62;
+
     const job = {
       id: "story_corp2_" + Date.now(),
       origin,
@@ -196,7 +221,7 @@ export function spawnStoryJob(storyId: string) {
       basePay,
       pay,
       fuelCost: 11 + Math.round(distance * 2.2),
-      riskBase: 62,
+      riskBase,
       cargoType,
       distance,
       originZone: originData.zone,
@@ -208,7 +233,8 @@ export function spawnStoryJob(storyId: string) {
       storyId: "corpMission2",
       storyTitle: "Rede de Licitação Sombria",
       storySummary: "Rebocar licitações falsas para driblar concorrentes. Lucro alto, mas queixas de sabotagem podem atrair olhares.",
-      completed: false
+      completed: false,
+      maintenanceCost: estimateMaintenanceCost({ riskBase, distance })
     };
 
     gameState.jobs.unshift(job);
@@ -224,6 +250,8 @@ export function spawnStoryJob(storyId: string) {
     const basePay = 2100;
     const pay = basePay + Math.round(distance * 60);
 
+    const riskBase = 74;
+
     const job = {
       id: "story_syn2_" + Date.now(),
       origin,
@@ -232,7 +260,7 @@ export function spawnStoryJob(storyId: string) {
       basePay,
       pay,
       fuelCost: 14 + Math.round(distance * 3),
-      riskBase: 74,
+      riskBase,
       cargoType,
       distance,
       originZone: originData.zone,
@@ -244,7 +272,8 @@ export function spawnStoryJob(storyId: string) {
       storyId: "syndMission2",
       storyTitle: "Transponder Gêmeo",
       storySummary: "Circular por portos do núcleo com um transponder clonado para coletar dívidas e favores. Baixa margem para erros.",
-      completed: false
+      completed: false,
+      maintenanceCost: estimateMaintenanceCost({ riskBase, distance })
     };
 
     gameState.jobs.unshift(job);
@@ -316,13 +345,13 @@ export function runStoryMissionOutcome(job: Job) {
 
   if (job.storyId === "authMission1") {
     const bonus = 500;
-    gameState.credits += job.pay + bonus;
+    const { note } = settleStoryEconomy(job, job.pay + bonus);
     adjustReputation("authorities", +18);
     adjustReputation("syndicate", -10);
     gameState.storyFlags.authMission1Complete = true;
 
     addLog(
-      "MISSÃO ESPECIAL – Operação Rede Limpa: você atuou como isca em uma operação conjunta. Piratas foram cercados por fragatas das Autoridades.",
+      "MISSÃO ESPECIAL – Operação Rede Limpa: você atuou como isca em uma operação conjunta. Piratas foram cercados por fragatas das Autoridades." + note,
       "good"
     );
     adjustCrewMoraleRange(+5, +10);
@@ -335,13 +364,13 @@ export function runStoryMissionOutcome(job: Job) {
     const complicationRoll = randInt(1, 100);
     if (complicationRoll <= 20) {
       const bonus = 200;
-      gameState.credits += job.pay + bonus;
+      const { note } = settleStoryEconomy(job, job.pay + bonus);
       adjustReputation("corporations", +8);
       adjustReputation("authorities", +3);
       gameState.storyFlags.corpMission1Complete = true;
 
       addLog(
-        "MISSÃO ESPECIAL – Contrato VIP Experimental: houve um microvazamento, mas sua tripulação reagiu rápido. Entrega aceita com ressalvas e bônus moderado.",
+        "MISSÃO ESPECIAL – Contrato VIP Experimental: houve um microvazamento, mas sua tripulação reagiu rápido. Entrega aceita com ressalvas e bônus moderado." + note,
         "warning"
       );
       adjustCrewMoraleRange(+2, +6);
@@ -349,13 +378,13 @@ export function runStoryMissionOutcome(job: Job) {
       registerMissionCompletion({ ...baseData, reward: job.pay + bonus });
     } else {
       const bonus = 500;
-      gameState.credits += job.pay + bonus;
+      const { note } = settleStoryEconomy(job, job.pay + bonus);
       adjustReputation("corporations", +18);
       adjustReputation("authorities", +5);
       gameState.storyFlags.corpMission1Complete = true;
 
       addLog(
-        "MISSÃO ESPECIAL – Contrato VIP Experimental: transferência impecável dos protótipos, com elogio nominal ao capitão em relatório interno.",
+        "MISSÃO ESPECIAL – Contrato VIP Experimental: transferência impecável dos protótipos, com elogio nominal ao capitão em relatório interno." + note,
         "good"
       );
       adjustCrewMoraleRange(+6, +12);
@@ -369,13 +398,13 @@ export function runStoryMissionOutcome(job: Job) {
     const twist = randInt(1, 100);
     if (twist <= 25) {
       const bonus = 300;
-      gameState.credits += job.pay + bonus;
+      const { note } = settleStoryEconomy(job, job.pay + bonus);
       adjustReputation("syndicate", +16);
       adjustReputation("authorities", -15);
       gameState.storyFlags.syndMission1Complete = true;
 
       addLog(
-        "MISSÃO ESPECIAL – Golpe da Rota Fantasma: o golpe deu certo, mas parte do lucro 'evaporou' nas taxas internas do Sindicato.",
+        "MISSÃO ESPECIAL – Golpe da Rota Fantasma: o golpe deu certo, mas parte do lucro 'evaporou' nas taxas internas do Sindicato." + note,
         "warning"
       );
       adjustCrewMoraleRange(+3, +8);
@@ -383,14 +412,14 @@ export function runStoryMissionOutcome(job: Job) {
       registerMissionCompletion({ ...baseData, reward: job.pay + bonus });
     } else {
       const bonus = 900;
-      gameState.credits += job.pay + bonus;
+      const { note } = settleStoryEconomy(job, job.pay + bonus);
       adjustReputation("syndicate", +22);
       adjustReputation("authorities", -20);
       adjustReputation("corporations", -5);
       gameState.storyFlags.syndMission1Complete = true;
 
       addLog(
-        "MISSÃO ESPECIAL – Golpe da Rota Fantasma: a combinação de rotas falsas e transponder clonado entrou para o folclore do submundo.",
+        "MISSÃO ESPECIAL – Golpe da Rota Fantasma: a combinação de rotas falsas e transponder clonado entrou para o folclore do submundo." + note,
         "good"
       );
       adjustCrewMoraleRange(+8, +14);
@@ -404,12 +433,12 @@ export function runStoryMissionOutcome(job: Job) {
     const interception = randInt(1, 100);
     if (interception <= 35) {
       const bonus = 350;
-      gameState.credits += job.pay + bonus;
+      const { note } = settleStoryEconomy(job, job.pay + bonus);
       adjustReputation("authorities", +14);
       adjustReputation("syndicate", -8);
 
       addLog(
-        "MISSÃO ESPECIAL – Operação Guarda Solar: escolta sofreu abordagens simultâneas. Você manteve o comboio unido, com sensores instalados mesmo sob fogo cruzado. Autoridades aprovam a firmeza, mas a retaliação pirata já é comentada.",
+        "MISSÃO ESPECIAL – Operação Guarda Solar: escolta sofreu abordagens simultâneas. Você manteve o comboio unido, com sensores instalados mesmo sob fogo cruzado. Autoridades aprovam a firmeza, mas a retaliação pirata já é comentada." + note,
         "warning"
       );
       adjustCrewMoraleRange(+3, +7);
@@ -417,12 +446,12 @@ export function runStoryMissionOutcome(job: Job) {
       registerMissionCompletion({ ...baseData, reward: job.pay + bonus });
     } else {
       const bonus = 900;
-      gameState.credits += job.pay + bonus;
+      const { note } = settleStoryEconomy(job, job.pay + bonus);
       adjustReputation("authorities", +24);
       adjustReputation("syndicate", -14);
 
       addLog(
-        "MISSÃO ESPECIAL – Operação Guarda Solar: rede de vigilância concluída sem perdas, bloqueando duas rotas clandestinas. Relatos indicam que piratas juraram vingança discreta contra a tripulação.",
+        "MISSÃO ESPECIAL – Operação Guarda Solar: rede de vigilância concluída sem perdas, bloqueando duas rotas clandestinas. Relatos indicam que piratas juraram vingança discreta contra a tripulação." + note,
         "good"
       );
       adjustCrewMoraleRange(+7, +12);
@@ -437,12 +466,12 @@ export function runStoryMissionOutcome(job: Job) {
     const audit = randInt(1, 100);
     if (audit <= 30) {
       const bonus = 400;
-      gameState.credits += job.pay + bonus;
+      const { note } = settleStoryEconomy(job, job.pay + bonus);
       adjustReputation("corporations", +12);
       adjustReputation("authorities", -6);
 
       addLog(
-        "MISSÃO ESPECIAL – Rede de Licitação Sombria: um auditor desconfiado rastreou parte do frete. Você desviou a atenção com dados falsos, garantindo lucro, mas rumores de manipulação podem voltar em reuniões futuras.",
+        "MISSÃO ESPECIAL – Rede de Licitação Sombria: um auditor desconfiado rastreou parte do frete. Você desviou a atenção com dados falsos, garantindo lucro, mas rumores de manipulação podem voltar em reuniões futuras." + note,
         "warning"
       );
       adjustCrewMoraleRange(+2, +5);
@@ -450,12 +479,12 @@ export function runStoryMissionOutcome(job: Job) {
       registerMissionCompletion({ ...baseData, reward: job.pay + bonus });
     } else {
       const bonus = 950;
-      gameState.credits += job.pay + bonus;
+      const { note } = settleStoryEconomy(job, job.pay + bonus);
       adjustReputation("corporations", +22);
       adjustReputation("authorities", +4);
 
       addLog(
-        "MISSÃO ESPECIAL – Rede de Licitação Sombria: as propostas isca derrubaram concorrentes, e você foi citado como peça-chave na manobra. Conselho corporativo sinaliza contratos preferenciais, mas rivais memorizaram seu rosto.",
+        "MISSÃO ESPECIAL – Rede de Licitação Sombria: as propostas isca derrubaram concorrentes, e você foi citado como peça-chave na manobra. Conselho corporativo sinaliza contratos preferenciais, mas rivais memorizaram seu rosto." + note,
         "good"
       );
       adjustCrewMoraleRange(+6, +10);
@@ -470,13 +499,13 @@ export function runStoryMissionOutcome(job: Job) {
     const shadow = randInt(1, 100);
     if (shadow <= 40) {
       const bonus = 500;
-      gameState.credits += job.pay + bonus;
+      const { note } = settleStoryEconomy(job, job.pay + bonus);
       adjustReputation("syndicate", +14);
       adjustReputation("authorities", -12);
       adjustReputation("corporations", -6);
 
       addLog(
-        "MISSÃO ESPECIAL – Transponder Gêmeo: duas patrulhas desconfiaram do transponder clonado. Você usou rotas laterais, mas deixou rastros que podem ser cruzados depois. O Sindicato aprecia a ousadia, mesmo sabendo do risco latente.",
+        "MISSÃO ESPECIAL – Transponder Gêmeo: duas patrulhas desconfiaram do transponder clonado. Você usou rotas laterais, mas deixou rastros que podem ser cruzados depois. O Sindicato aprecia a ousadia, mesmo sabendo do risco latente." + note,
         "warning"
       );
       adjustCrewMoraleRange(+3, +8);
@@ -484,13 +513,13 @@ export function runStoryMissionOutcome(job: Job) {
       registerMissionCompletion({ ...baseData, reward: job.pay + bonus });
     } else {
       const bonus = 1100;
-      gameState.credits += job.pay + bonus;
+      const { note } = settleStoryEconomy(job, job.pay + bonus);
       adjustReputation("syndicate", +26);
       adjustReputation("authorities", -22);
       adjustReputation("corporations", -10);
 
       addLog(
-        "MISSÃO ESPECIAL – Transponder Gêmeo: você sincronizou o transponder clonado com cobranças antigas e limpou dívidas do Sindicato. Boato nos portos diz que inspetores estão caçando a nave 'fantasma' que roubou taxas.",
+        "MISSÃO ESPECIAL – Transponder Gêmeo: você sincronizou o transponder clonado com cobranças antigas e limpou dívidas do Sindicato. Boato nos portos diz que inspetores estão caçando a nave 'fantasma' que roubou taxas." + note,
         "good"
       );
       adjustCrewMoraleRange(+8, +14);
@@ -501,7 +530,7 @@ export function runStoryMissionOutcome(job: Job) {
     return;
   }
 
-  gameState.credits += job.pay;
-  addLog("Missão especial concluída. Consequências registradas e pagamento recebido.", "good");
+  const { note } = settleStoryEconomy(job, job.pay);
+  addLog("Missão especial concluída. Consequências registradas e pagamento recebido." + note, "good");
   registerMissionCompletion(baseData);
 }
