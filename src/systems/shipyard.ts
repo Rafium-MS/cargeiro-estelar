@@ -3,6 +3,7 @@ import { addLog } from "../core/services/log";
 import { ActionResult } from "../core/services/types";
 import { gameState } from "../core/state";
 import { SHIP_DEFINITIONS, ShipDefinition, getShipDefinition } from "../core/ships";
+import { getShipUnlockHint, isShipUnlocked } from "./progression";
 
 const UPGRADE_BONUS = {
   hull: 20,
@@ -28,6 +29,12 @@ export function getShipyardCatalog() {
 export function switchShip(shipKey: string): ActionResult {
   const ship = getShipDefinition(shipKey);
   if (!ship) return { success: false, error: "Nave não encontrada" };
+
+  if (!isShipUnlocked(ship.key)) {
+    const reason = getShipUnlockHint(ship.key);
+    addLog(reason ?? "Esse casco ainda não foi liberado pelas docas.", "warning");
+    return { success: false, error: "Nave bloqueada" };
+  }
 
   if (gameState.ship.key === ship.key) {
     addLog(`O ${ship.name} já é sua nave atual.`, "warning");

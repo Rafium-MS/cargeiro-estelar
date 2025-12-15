@@ -2,6 +2,7 @@ import { UpgradeType } from "../core/models";
 import { gameServices } from "../core/services";
 import { gameState } from "../core/state";
 import { getShipyardCatalog, getShipTraitSummary } from "../systems/shipyard";
+import { getShipUnlockHint, isShipUnlocked } from "../systems/progression";
 
 function getUpgradeData(type: UpgradeType) {
   const level = gameState.upgrades[type] || 0;
@@ -75,7 +76,8 @@ export function renderShipyard() {
 
   catalog.forEach(ship => {
     const card = document.createElement("div");
-    card.className = "ship-card";
+    const unlocked = isShipUnlocked(ship.key);
+    card.className = unlocked ? "ship-card" : "ship-card locked";
 
     const header = document.createElement("div");
     header.className = "ship-card-header";
@@ -101,10 +103,11 @@ export function renderShipyard() {
     const traits = document.createElement("div");
     traits.className = "ship-card-traits";
     traits.textContent = getShipTraitSummary(ship);
-    if (ship.unlockHint) {
+    const unlockHint = getShipUnlockHint(ship.key);
+    if (unlockHint) {
       const hint = document.createElement("div");
       hint.className = "ship-card-hint";
-      hint.textContent = ship.unlockHint;
+      hint.textContent = unlockHint;
       traits.appendChild(hint);
     }
 
@@ -112,9 +115,14 @@ export function renderShipyard() {
     actions.className = "ship-card-actions";
     const btn = document.createElement("button");
     const isCurrent = ship.key === gameState.ship.key;
-    btn.textContent = isCurrent ? "Em operação" : `Adquirir (${ship.price} cr)`;
-    btn.disabled = isCurrent || gameState.credits < ship.price;
-    btn.onclick = () => gameServices.actions.switchShip(ship.key);
+    if (!unlocked) {
+      btn.textContent = "Bloqueada";
+      btn.disabled = true;
+    } else {
+      btn.textContent = isCurrent ? "Em operação" : `Adquirir (${ship.price} cr)`;
+      btn.disabled = isCurrent || gameState.credits < ship.price;
+      btn.onclick = () => gameServices.actions.switchShip(ship.key);
+    }
     actions.appendChild(btn);
 
     card.appendChild(header);

@@ -213,6 +213,7 @@
       display: grid;
       gap: 6px;
     }
+    .ship-card.locked { opacity: 0.6; border-style: dashed; }
 
     .ship-card-header {
       display: flex;
@@ -458,6 +459,13 @@
             <h2>Docas / Troca de Cargueiro</h2>
             <div class="small">Escolha um novo casco quando tiver créditos suficientes. Upgrades já instalados são aplicados ao novo navio.</div>
             <div id="shipyard-list" class="shipyard-list"></div>
+          </div>
+          <div class="panel">
+            <h2>Progressão</h2>
+            <div class="small">Marcos liberam naves, upgrades visíveis e contratos mais raros.</div>
+            <div id="progression-list" class="map-list"></div>
+            <h3 style="margin-top:12px;">Desbloqueios ativos</h3>
+            <div id="progression-unlocks" class="map-list"></div>
           </div>
         </div>
       </section>

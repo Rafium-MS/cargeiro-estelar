@@ -1,9 +1,9 @@
 // src/core/state.ts
 import { MAP_LOCATIONS } from "./data";
 import { loadPersistedGameState } from "./dataLoader";
-import { GameState, Reputation, Ship, StoryFlags, UpgradeState } from "./models";
+import { GameState, ProgressionState, Reputation, Ship, StoryFlags, UpgradeState } from "./models";
 import { LOCATIONS, getLocationData } from "./map";
-import { ShipId, getShipDefinition } from "./ships";
+import { SHIPS, ShipId, getShipDefinition } from "./ships";
 
 const startingShipDef = getShipDefinition("lv01" as ShipId)!;
 
@@ -28,6 +28,18 @@ const startingUpgrades: UpgradeState = {
   cargo: 0,
   fuel: 0,
   quarters: 0
+};
+
+const startingUnlockedShips: ShipId[] = Array.from(
+  new Set(
+    SHIPS.filter(ship => ship.default).map(ship => ship.id as ShipId).concat(startingShipDef.key)
+  )
+);
+
+const startingProgression: ProgressionState = {
+  unlockedShips: startingUnlockedShips,
+  unlockedUpgrades: ["hull", "cargo", "fuel", "quarters"],
+  milestonesCompleted: []
 };
 
 const startingReputation: Reputation = {
@@ -64,7 +76,8 @@ const baseGameState: GameState = {
   upgrades: startingUpgrades,
   reputation: startingReputation,
   storyFlags: startingStoryFlags,
-  missionHistory: []
+  missionHistory: [],
+  progression: startingProgression
 };
 
 const persistedGameState = loadPersistedGameState();

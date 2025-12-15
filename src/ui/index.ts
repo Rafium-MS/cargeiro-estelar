@@ -2,11 +2,13 @@ export { renderState, renderMap, renderReputation, renderHistory } from "./rende
 export { renderJobs } from "./renderJobs";
 export { renderCrew, renderCrewCandidates } from "./renderCrew";
 export { renderUpgrades, renderShipyard } from "./renderUpgrades";
+export { renderProgression } from "./renderProgression";
 
 import { renderCrew, renderCrewCandidates } from "./renderCrew";
 import { renderHistory, renderMap, renderReputation, renderState } from "./renderState";
 import { renderJobs } from "./renderJobs";
 import { renderShipyard } from "./renderUpgrades";
+import { renderProgression } from "./renderProgression";
 import { renderLog } from "./log";
 
 export function renderAll() {
@@ -15,6 +17,7 @@ export function renderAll() {
   renderCrewCandidates();
   renderJobs();
   renderShipyard();
+  renderProgression();
   renderHistory();
   renderLog();
 }
