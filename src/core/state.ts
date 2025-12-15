@@ -1,5 +1,6 @@
 // src/core/state.ts
 import { MAP_LOCATIONS } from "./data";
+import { loadPersistedGameState } from "./dataLoader";
 import { GameState, Reputation, Ship, StoryFlags, UpgradeState } from "./models";
 import { LOCATIONS, getLocationData } from "./map";
 import { ShipId, getShipDefinition } from "./ships";
@@ -50,7 +51,7 @@ const startingStoryFlags: StoryFlags = {
   syndMission2Complete: false
 };
 
-export const gameState: GameState = {
+const baseGameState: GameState = {
   day: 1,
   credits: 1000,
   ship: createShipState(),
@@ -65,5 +66,11 @@ export const gameState: GameState = {
   storyFlags: startingStoryFlags,
   missionHistory: []
 };
+
+const persistedGameState = loadPersistedGameState();
+
+export const gameState: GameState = persistedGameState
+  ? { ...baseGameState, ...persistedGameState }
+  : baseGameState;
 
 export { LOCATIONS, MAP_LOCATIONS, getLocationData };

@@ -7,6 +7,7 @@ import { refuelShip } from "../../systems/fuel";
 import { switchShip } from "../../systems/shipyard";
 import { addLog } from "./log";
 import { UpgradeType } from "../models";
+import { persistGameState } from "../dataLoader";
 
 type GameListener = StateListener<typeof gameState>;
 
@@ -14,6 +15,7 @@ const listeners: GameListener[] = [];
 
 function notify() {
   listeners.forEach(listener => listener(gameState));
+  persistGameState(gameState);
 }
 
 function runWithNotification(action: () => ActionResult): ActionResult {

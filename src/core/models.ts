@@ -1,5 +1,5 @@
 // src/core/models.ts
-import { CARGO_TYPES } from "./data";
+import type { CargoTypeDefinition } from "./dataLoader";
 import { ShipId } from "./ships";
 
 export type FactionKey = "authorities" | "corporations" | "syndicate";
@@ -51,7 +51,7 @@ export type CrewMember = {
   effects?: CrewEffect[];
 };
 
-export type CargoType = (typeof CARGO_TYPES)[number];
+export type CargoType = CargoTypeDefinition;
 
 export type Job = {
   id: string;
