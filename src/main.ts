@@ -1,25 +1,25 @@
 // src/main.ts
-import { gameServices } from "./core/services";
-import { addLog } from "./core/services/log";
-import { renderAll } from "./ui";
-import { initUIBindings } from "./ui/bindings";
-import { renderLog } from "./ui/log";
+import { GameApp } from "./app/gameApp";
 
-function initGame() {
-  gameServices.subscribe(() => {
-    renderAll();
-    renderLog();
+function setupGlobalErrorHandlers() {
+  window.addEventListener("error", (event) => {
+    console.error("Unexpected error:", event.error ?? event.message);
   });
 
-  addLog(
-    "Bem-vindo ao comando do Cargueiro LV-01. Sua fama no setor vai destravar missões especiais com história própria.",
-    "good"
-  );
-
-  renderAll();
-  renderLog();
-  gameServices.actions.generateJobs();
-  initUIBindings();
+  window.addEventListener("unhandledrejection", (event) => {
+    console.error("Unhandled promise rejection:", event.reason);
+  });
 }
 
-initGame();
+function startGameApp() {
+  const app = new GameApp();
+  app.start();
+  return app;
+}
+
+try {
+  setupGlobalErrorHandlers();
+  startGameApp();
+} catch (error) {
+  console.error("Failed to start the game app:", error);
+}
