@@ -1,10 +1,8 @@
 // src/core/ships.ts
-import shipsData from "../data/ships.json";
-import shipVisualsData from "../data/ship_visuals.json";
+import { getStaticData, ShipData, ShipVisualData } from "./dataLoader";
 
-export type ShipData = (typeof shipsData)[number];
 export type ShipId = ShipData["id"];
-export type ShipVisual = (typeof shipVisualsData)[number];
+export type ShipVisual = ShipVisualData;
 
 export type ShipDefinition = {
   key: ShipId;
@@ -20,6 +18,8 @@ export type ShipDefinition = {
   smugglerHold?: number;
   unlockHint?: string;
 };
+
+const { ships: shipsData, shipVisuals: shipVisualsData } = getStaticData();
 
 export const SHIPS = shipsData;
 export const SHIP_VISUALS = shipVisualsData;

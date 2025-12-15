@@ -5,6 +5,7 @@ import { addLog } from "../core/services/log";
 import { ActionResult } from "../core/services/types";
 import { LOCATIONS, getLocationData, distanceBetween } from "../core/map";
 import { gameState } from "../core/state";
+import { updateDerivedData } from "../core/dataLoader";
 import {
   getCrewStats,
   adjustCrewMoraleRange,
@@ -111,6 +112,7 @@ export function generateJobs(): ActionResult {
   }
 
   gameState.jobs = jobs;
+  updateDerivedData({ dailyJobs: jobs });
   return { success: true };
 }
 
